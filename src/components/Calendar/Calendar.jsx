@@ -1,128 +1,138 @@
-import React, { useState } from 'react';
-import { format, differenceInWeeks } from 'date-fns';
+import React, { useState, useEffect } from 'react';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, 
+         isSameMonth, addMonths, subMonths, getDay, isToday, differenceInWeeks } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import './Calendar.css';
 
 function Calendar() {
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState(() => {
+    const savedEvents = localStorage.getItem('calendar-events');
+    return savedEvents ? JSON.parse(savedEvents) : [];
+  });
+  
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [showEventForm, setShowEventForm] = useState(false);
+  
   const startDate = new Date('2024-03-22');
   const currentDate = new Date();
   const weeksCount = differenceInWeeks(currentDate, startDate);
 
+  useEffect(() => {
+    localStorage.setItem('calendar-events', JSON.stringify(events));
+  }, [events]);
+
+  const getDaysInMonth = (date) => {
+    const start = startOfMonth(date);
+    const end = endOfMonth(date);
+    const days = eachDayOfInterval({ start, end });
+    const startDay = getDay(start);
+    const prefixDays = Array(startDay === 0 ? 6 : startDay - 1).fill(null);
+    return [...prefixDays, ...days];
+  };
+
   const addEvent = (event) => {
     setEvents(prev => [...prev, {
       ...event,
-      id: Date.now()
+      id: Date.now(),
+      date: selectedDate.toISOString().split('T')[0]
     }]);
+    setShowEventForm(false);
+    setSelectedDate(null);
   };
 
-  const addPhotoToEvent = (eventId, photo) => {
-    setEvents(prev => prev.map(event => 
-      event.id === eventId 
-        ? { ...event, photo: URL.createObjectURL(photo) }
-        : event
-    ));
+  const getEventsForDay = (day) => {
+    if (!day) return [];
+    return events.filter(event => isSameDay(new Date(event.date), day));
   };
 
   return (
-    <div className="calendar">
-      <h1>Наш Календарь</h1>
-      <div className="weeks-counter">
-        Мы вместе уже {weeksCount} недель! ❤️
-      </div>
-      
-      <div className="add-event-form">
-        <h3>Добавить новое событие</h3>
-        <form onSubmit={(e) => {
-          e.preventDefault();
-          const formData = new FormData(e.target);
-          addEvent({
-            title: formData.get('title'),
-            date: formData.get('date'),
-            time: formData.get('time'),
-            description: formData.get('description')
-          });
-          e.target.reset();
-        }}>
-          <div className="form-group">
-            <label>Название события</label>
-            <input 
-              type="text" 
-              name="title" 
-              placeholder="Например: Романтический ужин" 
-              required 
-            />
+    <div className="calendar-container">
+      <div className="calendar-stats">
+        <div className="stats-content">
+          <div className="weeks-counter">
+            <span className="heart-icon">❤️</span>
+            <span>Вместе {weeksCount} недель</span>
           </div>
-          
-          <div className="form-group">
-            <label>Дата</label>
-            <input 
-              type="date" 
-              name="date" 
-              required 
-            />
+          <div className="start-date">
+            Начало истории:<br />
+            {format(startDate, 'd MMMM yyyy', { locale: ru })}
           </div>
-          
-          <div className="form-group">
-            <label>Время</label>
-            <input 
-              type="time" 
-              name="time" 
-              required 
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Описание</label>
-            <textarea 
-              name="description" 
-              placeholder="Добавьте описание события..." 
-              rows="4"
-            />
-          </div>
-          
-          <button type="submit" className="submit-button">
-            Добавить событие
-          </button>
-        </form>
+        </div>
       </div>
 
-      <div className="events-list">
-        {events
-          .sort((a, b) => new Date(a.date) - new Date(b.date))
-          .map(event => (
-            <div key={event.id} className="event-card">
-              <div className="event-header">
-                <h3>{event.title}</h3>
-                <span className="event-date">
-                  {format(new Date(event.date), 'dd MMMM yyyy', { locale: ru })} в {event.time}
-                </span>
-              </div>
-              
-              <div className="event-description">
-                <p>{event.description}</p>
-              </div>
-              
-              <div className="event-photo">
-                {event.photo ? (
-                  <img src={event.photo} alt={event.title} />
-                ) : (
-                  <div className="photo-upload">
-                    <label className="photo-upload-label">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => addPhotoToEvent(event.id, e.target.files[0])}
-                        className="photo-input"
-                      />
-                      <span>Добавить фото</span>
-                    </label>
-                  </div>
+      <div className="calendar-main">
+        <div className="calendar-grid">
+          <div className="calendar-navigation">
+            <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>←</button>
+            <h2>{format(currentMonth, 'LLLL yyyy', { locale: ru })}</h2>
+            <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>→</button>
+          </div>
+
+          <div className="weekdays">
+            {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map(day => (
+              <div key={day} className="weekday">{day}</div>
+            ))}
+          </div>
+
+          <div className="days">
+            {getDaysInMonth(currentMonth).map((day, idx) => (
+              <div 
+                key={day ? day.toString() : `empty-${idx}`}
+                className={`day-cell ${!day ? 'empty' : ''} 
+                  ${day && isToday(day) ? 'today' : ''} 
+                  ${day && !isSameMonth(day, currentMonth) ? 'different-month' : ''}
+                  ${day && selectedDate && isSameDay(day, selectedDate) ? 'selected' : ''}`}
+                onClick={() => day && setSelectedDate(day)}
+              >
+                {day && (
+                  <>
+                    <div className="day-number">{format(day, 'd')}</div>
+                    <div className="day-events">
+                      {getEventsForDay(day).map(event => (
+                        <div 
+                          key={event.id} 
+                          className="event-pill"
+                          style={{ backgroundColor: event.color || '#2563eb' }}
+                        >
+                          {event.time} {event.title}
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 )}
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+        </div>
       </div>
+
+      {selectedDate && (
+        <div className="event-form-overlay" onClick={() => setSelectedDate(null)}>
+          <div className="event-form" onClick={e => e.stopPropagation()}>
+            <h3>{format(selectedDate, 'd MMMM yyyy', { locale: ru })}</h3>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target);
+              addEvent({
+                title: formData.get('title'),
+                time: formData.get('time'),
+                description: formData.get('description'),
+                color: formData.get('color')
+              });
+            }}>
+              <input type="text" name="title" placeholder="Название события" required />
+              <input type="time" name="time" required />
+              <textarea name="description" placeholder="Описание события..." rows="3" />
+              <input type="color" name="color" defaultValue="#2563eb" />
+              <div className="form-buttons">
+                <button type="submit">Добавить</button>
+                <button type="button" onClick={() => setSelectedDate(null)}>Отмена</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
