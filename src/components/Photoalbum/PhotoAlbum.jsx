@@ -5,18 +5,17 @@ import './PhotoAlbum.css';
 
 function PhotoAlbum() {
   const [months, setMonths] = useState(() => {
-    const savedMonths = localStorage.getItem('photo-album');
-    return savedMonths ? JSON.parse(savedMonths) : [];
+    const saved = localStorage.getItem('photo-album');
+    return saved ? JSON.parse(saved) : {};
   });
-  
+
   const startDate = new Date('2024-03-22');
   const currentDate = new Date();
 
-  // Получаем все месяцы от даты начала до текущей даты
   const monthsArray = eachMonthOfInterval({
     start: startDate,
     end: currentDate
-  }).sort(compareDesc); // Сортируем по убыванию (новые первые)
+  }).sort(compareDesc);
 
   useEffect(() => {
     localStorage.setItem('photo-album', JSON.stringify(months));
@@ -25,8 +24,8 @@ function PhotoAlbum() {
   const addPhoto = (monthIndex, photo) => {
     const reader = new FileReader();
     reader.onloadend = () => {
-      setMonths(prevMonths => {
-        const newMonths = [...prevMonths];
+      setMonths(prev => {
+        const newMonths = { ...prev };
         const monthKey = format(monthsArray[monthIndex], 'yyyy-MM');
         if (!newMonths[monthKey]) {
           newMonths[monthKey] = { photos: [] };
@@ -44,8 +43,8 @@ function PhotoAlbum() {
   };
 
   const updatePhotoDetails = (monthKey, photoIndex, details) => {
-    setMonths(prevMonths => {
-      const newMonths = { ...prevMonths };
+    setMonths(prev => {
+      const newMonths = { ...prev };
       if (newMonths[monthKey]?.photos[photoIndex]) {
         newMonths[monthKey].photos[photoIndex] = {
           ...newMonths[monthKey].photos[photoIndex],
@@ -58,12 +57,12 @@ function PhotoAlbum() {
 
   return (
     <div className="photo-album-container">
-      <div className="photo-album-header">
+      <header className="album-header">
         <h1>Наш Фотоальбом</h1>
         <div className="current-date">
           {format(currentDate, 'd MMMM yyyy', { locale: ru })}
         </div>
-      </div>
+      </header>
 
       <div className="months-grid">
         {monthsArray.map((month, index) => {
@@ -76,7 +75,6 @@ function PhotoAlbum() {
                   {months[monthKey]?.photos?.length || 0} фото
                 </div>
               </div>
-              
               <div className="photos-grid">
                 {months[monthKey]?.photos?.map((photo, photoIndex) => (
                   <div key={photoIndex} className="photo-container">
@@ -87,20 +85,23 @@ function PhotoAlbum() {
                           type="text"
                           placeholder="Название"
                           value={photo.title}
-                          onChange={(e) => updatePhotoDetails(monthKey, photoIndex, { title: e.target.value })}
+                          onChange={(e) =>
+                            updatePhotoDetails(monthKey, photoIndex, { title: e.target.value })
+                          }
                           className="photo-title-input"
                         />
                         <textarea
                           placeholder="Описание"
                           value={photo.description}
-                          onChange={(e) => updatePhotoDetails(monthKey, photoIndex, { description: e.target.value })}
+                          onChange={(e) =>
+                            updatePhotoDetails(monthKey, photoIndex, { description: e.target.value })
+                          }
                           className="photo-description-input"
                         />
                       </div>
                     </div>
                   </div>
                 ))}
-                
                 <div className="add-photo">
                   <label className="add-photo-label">
                     <input
