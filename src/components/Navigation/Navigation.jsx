@@ -8,7 +8,7 @@ function Navigation() {
       <div className="nav-logo">Наша История Любви</div>
       <div className="nav-links">
         <Link to="/">Фотоальбом</Link>
-        <Link to="/calendar">Календарь</Link>
+        <Link to="/calendar">Календар</Link>
       </div>
     </nav>
   );
