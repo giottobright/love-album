@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, 
-         isSameMonth, addMonths, subMonths, getDay, isToday, differenceInWeeks } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth, addMonths, subMonths, getDay, isToday, differenceInWeeks } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import './Calendar.css';
 
@@ -12,7 +11,6 @@ function Calendar() {
   
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
-  const [showEventForm, setShowEventForm] = useState(false);
   
   const startDate = new Date('2024-03-22');
   const currentDate = new Date();
@@ -37,7 +35,7 @@ function Calendar() {
       id: Date.now(),
       date: selectedDate.toISOString().split('T')[0]
     }]);
-    setShowEventForm(false);
+    // После добавления события скрываем форму, сбрасывая выбранную дату
     setSelectedDate(null);
   };
 
