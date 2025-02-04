@@ -12,7 +12,8 @@ import {
 import { ru } from 'date-fns/locale';
 import './Calendar.css';
 
-function Calendar({ selectedDate, setSelectedDate, isAddMode, setIsAddMode }) {
+function Calendar({ selectedDate, setSelectedDate, isAddMode, setIsAddMode, onEventClick, calendarRefresh }) {
+  // Изначально читаем события из localStorage
   const [events, setEvents] = useState(() => {
     const saved = localStorage.getItem('calendar-events');
     return saved ? JSON.parse(saved) : [];
@@ -20,16 +21,18 @@ function Calendar({ selectedDate, setSelectedDate, isAddMode, setIsAddMode }) {
   
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
-  // Состояния для формы добавления события (используются в режиме добавления)
+  // Состояния для формы добавления события
   const [newEventTitle, setNewEventTitle] = useState("");
   const [newEventDescription, setNewEventDescription] = useState("");
   const [formDate, setFormDate] = useState(selectedDate || new Date());
 
+  // При изменении calendarRefresh перечитываем события из localStorage
   useEffect(() => {
-    localStorage.setItem('calendar-events', JSON.stringify(events));
-  }, [events]);
+    const saved = localStorage.getItem('calendar-events');
+    setEvents(saved ? JSON.parse(saved) : []);
+  }, [calendarRefresh]);
 
-  // Если выбранная дата изменилась и включён режим добавления, обновляем дату в форме
+  // Обновляем дату формы, если выбранная дата изменилась и включён режим добавления
   useEffect(() => {
     if (isAddMode && selectedDate) {
       setFormDate(selectedDate);
@@ -58,7 +61,9 @@ function Calendar({ selectedDate, setSelectedDate, isAddMode, setIsAddMode }) {
       title: newEventTitle,
       description: newEventDescription
     };
-    setEvents(prev => [...prev, newEvent]);
+    const updatedEvents = [...events, newEvent];
+    localStorage.setItem('calendar-events', JSON.stringify(updatedEvents));
+    setEvents(updatedEvents);
     setNewEventTitle("");
     setNewEventDescription("");
     // Выходим из режима добавления после успешного добавления события
@@ -115,7 +120,11 @@ function Calendar({ selectedDate, setSelectedDate, isAddMode, setIsAddMode }) {
           <div className="events-list-day">
             {getEventsForDay(selectedDate).length > 0 ? (
               getEventsForDay(selectedDate).map(event => (
-                <div key={event.id} className="event-item-day">
+                <div 
+                  key={event.id} 
+                  className="event-item-day"
+                  onClick={() => onEventClick && onEventClick(event)}
+                >
                   <strong>{event.title}</strong>
                   {event.description && <p>{event.description}</p>}
                 </div>

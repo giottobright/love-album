@@ -18,6 +18,8 @@ function Home() {
   const [modalEvent, setModalEvent] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [isAddMode, setIsAddMode] = useState(false);
+  // Дополнительное состояние для обновления Calendar после изменения событий
+  const [calendarRefresh, setCalendarRefresh] = useState(Date.now());
 
   useEffect(() => {
     const saved = localStorage.getItem('calendar-events');
@@ -29,7 +31,7 @@ function Home() {
       upcoming.sort((a, b) => new Date(a.date) - new Date(b.date));
       setUpcomingEvents(upcoming);
     }
-  }, []);
+  }, [calendarRefresh]);
 
   const handleAddEventClick = () => {
     setSelectedDate(new Date());
@@ -47,25 +49,25 @@ function Home() {
   };
 
   const handleDeleteEvent = (eventId) => {
-    const updatedEvents = upcomingEvents.filter(e => e.id !== eventId);
-    setUpcomingEvents(updatedEvents);
     const saved = localStorage.getItem('calendar-events');
     if (saved) {
       const events = JSON.parse(saved).filter(e => e.id !== eventId);
       localStorage.setItem('calendar-events', JSON.stringify(events));
     }
     setModalEvent(null);
+    // Обновляем календарь
+    setCalendarRefresh(Date.now());
   };
 
   const handleSaveEvent = (updatedEvent) => {
-    const updatedEvents = upcomingEvents.map(e => e.id === updatedEvent.id ? updatedEvent : e);
-    setUpcomingEvents(updatedEvents);
     const saved = localStorage.getItem('calendar-events');
     if (saved) {
       const events = JSON.parse(saved).map(e => e.id === updatedEvent.id ? updatedEvent : e);
       localStorage.setItem('calendar-events', JSON.stringify(events));
     }
     setModalEvent(null);
+    // Обновляем календарь
+    setCalendarRefresh(Date.now());
   };
 
   return (
@@ -91,11 +93,7 @@ function Home() {
         {upcomingEvents.length > 0 ? (
           <ul className="events-list">
             {upcomingEvents.map(event => (
-              <li
-                key={event.id}
-                className="event-item"
-                onClick={() => handleEventClick(event)}
-              >
+              <li key={event.id} className="event-item" onClick={() => handleEventClick(event)}>
                 <span>{event.title}</span>
                 <span>{format(new Date(event.date), 'd MMMM', { locale: ru })}</span>
               </li>
@@ -112,6 +110,8 @@ function Home() {
           setSelectedDate={setSelectedDate} 
           isAddMode={isAddMode} 
           setIsAddMode={setIsAddMode}
+          onEventClick={handleEventClick}
+          calendarRefresh={calendarRefresh}
         />
       </div>
 
