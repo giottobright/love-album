@@ -17,9 +17,10 @@ function Calendar({ selectedDate, setSelectedDate, isAddMode, setIsAddMode }) {
     const saved = localStorage.getItem('calendar-events');
     return saved ? JSON.parse(saved) : [];
   });
-  const [currentMonth, setCurrentMonth] = useState(new Date());
   
-  // Состояния для формы добавления события (используются только в режиме добавления)
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+
+  // Состояния для формы добавления события (используются в режиме добавления)
   const [newEventTitle, setNewEventTitle] = useState("");
   const [newEventDescription, setNewEventDescription] = useState("");
   const [formDate, setFormDate] = useState(selectedDate || new Date());
@@ -60,7 +61,7 @@ function Calendar({ selectedDate, setSelectedDate, isAddMode, setIsAddMode }) {
     setEvents(prev => [...prev, newEvent]);
     setNewEventTitle("");
     setNewEventDescription("");
-    // Выход из режима добавления после успешного добавления события
+    // Выходим из режима добавления после успешного добавления события
     setIsAddMode(false);
   };
 

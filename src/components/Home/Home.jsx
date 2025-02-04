@@ -5,6 +5,7 @@ import Calendar from '../Calendar/Calendar';
 import PeopleIcon from '@mui/icons-material/People';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import AddIcon from '@mui/icons-material/Add';
+import EventModal from '../EventModal/EventModal';
 import './Home.css';
 
 function Home() {
@@ -14,6 +15,9 @@ function Home() {
   const weeksTogether = differenceInWeeks(now, startDate);
 
   const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [modalEvent, setModalEvent] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [isAddMode, setIsAddMode] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem('calendar-events');
@@ -27,20 +31,41 @@ function Home() {
     }
   }, []);
 
-  // Состояния для выбранной даты и режима добавления события
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [isAddMode, setIsAddMode] = useState(false);
-
   const handleAddEventClick = () => {
     setSelectedDate(new Date());
     setIsAddMode(true);
-    // Прокручиваем к форме добавления
     setTimeout(() => {
       const el = document.getElementById("day-details");
       if (el) {
         el.scrollIntoView({ behavior: "smooth" });
       }
     }, 100);
+  };
+
+  const handleEventClick = (event) => {
+    setModalEvent(event);
+  };
+
+  const handleDeleteEvent = (eventId) => {
+    const updatedEvents = upcomingEvents.filter(e => e.id !== eventId);
+    setUpcomingEvents(updatedEvents);
+    const saved = localStorage.getItem('calendar-events');
+    if (saved) {
+      const events = JSON.parse(saved).filter(e => e.id !== eventId);
+      localStorage.setItem('calendar-events', JSON.stringify(events));
+    }
+    setModalEvent(null);
+  };
+
+  const handleSaveEvent = (updatedEvent) => {
+    const updatedEvents = upcomingEvents.map(e => e.id === updatedEvent.id ? updatedEvent : e);
+    setUpcomingEvents(updatedEvents);
+    const saved = localStorage.getItem('calendar-events');
+    if (saved) {
+      const events = JSON.parse(saved).map(e => e.id === updatedEvent.id ? updatedEvent : e);
+      localStorage.setItem('calendar-events', JSON.stringify(events));
+    }
+    setModalEvent(null);
   };
 
   return (
@@ -66,9 +91,13 @@ function Home() {
         {upcomingEvents.length > 0 ? (
           <ul className="events-list">
             {upcomingEvents.map(event => (
-              <li key={event.id} className="event-item">
+              <li
+                key={event.id}
+                className="event-item"
+                onClick={() => handleEventClick(event)}
+              >
                 <span>{event.title}</span>
-                <span> {format(new Date(event.date), 'd MMMM', { locale: ru })}</span>
+                <span>{format(new Date(event.date), 'd MMMM', { locale: ru })}</span>
               </li>
             ))}
           </ul>
@@ -85,6 +114,15 @@ function Home() {
           setIsAddMode={setIsAddMode}
         />
       </div>
+
+      {modalEvent && (
+        <EventModal 
+          event={modalEvent}
+          onClose={() => setModalEvent(null)}
+          onDelete={handleDeleteEvent}
+          onSave={handleSaveEvent}
+        />
+      )}
     </div>
   );
 }
