@@ -13,15 +13,11 @@ import { ru } from 'date-fns/locale';
 import './Calendar.css';
 
 function Calendar() {
-  const [events, setEvents] = useState(() => {
+  const [events] = useState(() => {
     const saved = localStorage.getItem('calendar-events');
     return saved ? JSON.parse(saved) : [];
   });
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(null);
-
-  // Удалена переменная weeksCount, так как она не используется
-  // const weeksCount = differenceInWeeks(currentDate, startDate);
 
   useEffect(() => {
     localStorage.setItem('calendar-events', JSON.stringify(events));
@@ -35,21 +31,6 @@ function Calendar() {
     const prefixDays = Array(startDay === 0 ? 6 : startDay - 1).fill(null);
     return [...prefixDays, ...days];
   };
-
-  // Удалена функция добавления события addEvent, так как она не используется
-  /*
-  const addEvent = (event) => {
-    setEvents(prev => [
-      ...prev,
-      {
-        ...event,
-        id: Date.now(),
-        date: selectedDate.toISOString().split('T')[0]
-      }
-    ]);
-    setSelectedDate(null);
-  };
-  */
 
   const getEventsForDay = (day) => {
     if (!day) return [];
@@ -75,7 +56,6 @@ function Calendar() {
           <div 
             key={index} 
             className={`day-cell ${!day ? 'empty' : ''} ${day && isSameDay(day, new Date()) ? 'today' : ''}`}
-            onClick={() => day && setSelectedDate(day)}
           >
             {day && <div className="day-number">{format(day, 'd')}</div>}
             {day && getEventsForDay(day).map(event => (
