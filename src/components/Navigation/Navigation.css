@@ -1,34 +1,32 @@
 .bottom-navigation {
+  display: flex;
   position: fixed;
   bottom: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
+  width: 100%;
   background: #0E1621;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  border-top: 1px solid #2c3a4a;
-  z-index: 1000;
+  border-top: 1px solid #333;
 }
 
 .nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-decoration: none;
+  flex: 1;
+  text-align: center;
+  padding: 10px 0;
   color: #b0b0b0;
-  font-size: 12px;
+  text-decoration: none;
+  transition: color 0.3s;
 }
 
 .nav-item.active {
-  color: #4fc3f7;
+  color: #8B5CF6;
 }
 
 .nav-icon {
   font-size: 24px;
+  transition: color 0.3s;
 }
 
 .nav-label {
-  margin-top: 2px;
+  font-size: 12px;
+  display: block;
+  margin-top: 4px;
 }

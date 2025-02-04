@@ -63,7 +63,6 @@ function PhotoAlbum() {
           {format(currentDate, 'd MMMM yyyy', { locale: ru })}
         </div>
       </header>
-
       <div className="months-grid">
         {monthsArray.map((month, index) => {
           const monthKey = format(month, 'yyyy-MM');
@@ -76,27 +75,28 @@ function PhotoAlbum() {
                 </div>
               </div>
               <div className="photos-grid">
-                {months[monthKey]?.photos?.map((photo, photoIndex) => (
-                  <div key={photoIndex} className="photo-container">
+                {months[monthKey]?.photos?.map((photo, idx) => (
+                  <div key={idx} className="photo-container">
                     <div className="photo-wrapper">
                       <img src={photo.url} alt={photo.title} />
                       <div className="photo-overlay">
                         <input
                           type="text"
+                          className="photo-title-input"
                           placeholder="Название"
                           value={photo.title}
                           onChange={(e) =>
-                            updatePhotoDetails(monthKey, photoIndex, { title: e.target.value })
+                            updatePhotoDetails(monthKey, idx, { title: e.target.value })
                           }
-                          className="photo-title-input"
                         />
-                        <textarea
+                        <input
+                          type="text"
+                          className="photo-description-input"
                           placeholder="Описание"
                           value={photo.description}
                           onChange={(e) =>
-                            updatePhotoDetails(monthKey, photoIndex, { description: e.target.value })
+                            updatePhotoDetails(monthKey, idx, { description: e.target.value })
                           }
-                          className="photo-description-input"
                         />
                       </div>
                     </div>
@@ -107,12 +107,15 @@ function PhotoAlbum() {
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={(e) => addPhoto(index, e.target.files[0])}
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          addPhoto(index, e.target.files[0]);
+                        }
+                      }}
                       className="photo-input"
                     />
                     <span className="add-photo-text">
-                      <span className="add-icon">+</span>
-                      Добавить фото
+                      <span className="add-icon">+</span> Добавить фото
                     </span>
                   </label>
                 </div>
