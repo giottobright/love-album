@@ -4,6 +4,7 @@ import { ru } from 'date-fns/locale';
 import Calendar from '../Calendar/Calendar';
 import PeopleIcon from '@mui/icons-material/People';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import AddIcon from '@mui/icons-material/Add';
 import './Home.css';
 
 function Home() {
@@ -26,6 +27,22 @@ function Home() {
     }
   }, []);
 
+  // Состояния для выбранной даты и режима добавления события
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [isAddMode, setIsAddMode] = useState(false);
+
+  const handleAddEventClick = () => {
+    setSelectedDate(new Date());
+    setIsAddMode(true);
+    // Прокручиваем к форме добавления
+    setTimeout(() => {
+      const el = document.getElementById("day-details");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100);
+  };
+
   return (
     <div className="home-container">
       <div className="couple-card">
@@ -42,13 +59,16 @@ function Home() {
         <div className="events-header">
           <CalendarTodayIcon className="calendar-icon" />
           <h2>Ближайшие события</h2>
+          <button className="add-event-button" onClick={handleAddEventClick}>
+            <AddIcon />
+          </button>
         </div>
         {upcomingEvents.length > 0 ? (
           <ul className="events-list">
             {upcomingEvents.map(event => (
               <li key={event.id} className="event-item">
                 <span>{event.title}</span>
-                <span>- {format(new Date(event.date), 'd MMMM', { locale: ru })}</span>
+                <span> {format(new Date(event.date), 'd MMMM', { locale: ru })}</span>
               </li>
             ))}
           </ul>
@@ -58,7 +78,12 @@ function Home() {
       </div>
 
       <div className="calendar-wrapper">
-        <Calendar />
+        <Calendar 
+          selectedDate={selectedDate} 
+          setSelectedDate={setSelectedDate} 
+          isAddMode={isAddMode} 
+          setIsAddMode={setIsAddMode}
+        />
       </div>
     </div>
   );
