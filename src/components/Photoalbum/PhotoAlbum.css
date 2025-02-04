@@ -2,15 +2,62 @@
   background: #0E1621;
   color: #ffffff;
   min-height: 100vh;
+  padding-top: 110px; /* Отступ сверху: 60px шапка + 50px панель */
   padding-bottom: 60px;
 }
 
-.album-header h1 {
-  color: #ffffff;
-  text-align: center;
-  margin: 20px 0;
+.album-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px; /* Высота шапки */
+  background: #0E1621;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
 }
 
+.album-header h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 24px;
+}
+
+.add-photo-header {
+  position: fixed;
+  top: 60px;  /* Под шапкой */
+  left: 0;
+  right: 0;
+  height: 50px; /* Высота панели добавления фото */
+  background: #0E1621;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 20px;
+  z-index: 90;
+}
+
+.add-photo-button {
+  background: none;
+  border: 2px solid #8B5CF6;
+  color: #8B5CF6;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.add-photo-button:hover {
+  background: rgba(139, 92, 246, 0.1);
+}
+
+/* Остальные стили остаются без изменений */
 .months-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -67,30 +114,6 @@
   font-size: 12px;
 }
 
-/* Панель добавления фото */
-.add-photo-header {
-  padding: 10px 20px;
-  text-align: right;
-}
-
-.add-photo-button {
-  background: none;
-  border: 2px solid #8B5CF6;
-  color: #8B5CF6;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 16px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.add-photo-button:hover {
-  background: rgba(139, 92, 246, 0.1);
-}
-
 /* Стили для модального окна (форма загрузки фото) */
 .modal-overlay {
   position: fixed;
@@ -121,6 +144,8 @@
     transform: scale(1);
   }
 }
+
+/* Остальные стили для модального окна */
 
 .modal-content h2 {
   margin-top: 0;

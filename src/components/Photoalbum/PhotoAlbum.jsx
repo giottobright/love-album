@@ -23,6 +23,8 @@ function PhotoAlbum() {
   const [selectedFolder, setSelectedFolder] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedComment, setSelectedComment] = useState('');
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState('');
 
   const handleModalSubmit = () => {
     if (!selectedFolder || !selectedFile) {
@@ -31,7 +33,9 @@ function PhotoAlbum() {
     }
     const newPhoto = { 
       url: URL.createObjectURL(selectedFile),
-      comment: selectedComment // комментарий к фото
+      comment: selectedComment, // комментарий к фото
+      date: selectedDate,
+      location: selectedLocation
     };
     const updatedMonths = { ...months };
     if (!updatedMonths[selectedFolder]) {
@@ -44,6 +48,8 @@ function PhotoAlbum() {
     setSelectedFile(null);
     setSelectedFolder('');
     setSelectedComment('');
+    setSelectedDate('');
+    setSelectedLocation('');
   };
 
   return (
@@ -100,6 +106,23 @@ function PhotoAlbum() {
                 value={selectedComment} 
                 onChange={(e) => setSelectedComment(e.target.value)}
                 placeholder="Напишите комментарий к фото (необязательно)"
+              />
+            </label>
+            <label>
+              Дата:
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+              />
+            </label>
+            <label>
+              Локация:
+              <input
+                type="text"
+                value={selectedLocation}
+                onChange={(e) => setSelectedLocation(e.target.value)}
+                placeholder="Локация фото"
               />
             </label>
             <div className="modal-actions">
