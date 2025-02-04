@@ -68,7 +68,7 @@ function MonthPhotos() {
     setEditingFile(null);
   };
 
-  // Сохранение отредактированных данных для выбранного фото (в том числе замена фото, если выбрано новое)
+  // Сохранение отредактированных данных выбранного фото (в том числе замена фото, если выбрано новое)
   const saveEditedCaption = (index) => {
     const newPhotos = [...photos];
     newPhotos[index].comment = editingComment;
@@ -107,20 +107,16 @@ function MonthPhotos() {
         <button onClick={() => navigate('/photoalbum')} className="back-button">
           ←
         </button>
-        <h1>{format(monthDate, 'LLLL yyyy', { locale: ru })}</h1>
-      </header>
-
-      {/* Панель добавления фото */}
-      <div className="add-photo-header">
-        <button className="add-photo-button" onClick={() => setShowAddModal(true)}>
-          <span>Добавить фото</span>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" 
-               xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 5v14M5 12h14" stroke="#8B5CF6" strokeWidth="2"
-                  strokeLinecap="round" strokeLinejoin="round" />
+        <div className="month-title-wrapper">
+          <h1>{format(monthDate, 'LLLL yyyy', { locale: ru })}</h1>
+        </div>
+        <button className="add-photo-btn" onClick={() => setShowAddModal(true)}>
+          <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <line x1="12" y1="5" x2="12" y2="19" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            <line x1="5" y1="12" x2="19" y2="12" stroke="white" strokeWidth="2" strokeLinecap="round"/>
           </svg>
         </button>
-      </div>
+      </header>
 
       {showAddModal && (
         <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
@@ -171,7 +167,6 @@ function MonthPhotos() {
         </div>
       )}
 
-      {/* Лента фото */}
       <div className="photos-feed">
         {photos.map((photo, index) => (
           <div key={index} className="photo-item">

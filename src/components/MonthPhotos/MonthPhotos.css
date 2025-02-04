@@ -1,79 +1,69 @@
-/* Общие стили контейнера и шапки */
+/* Общие стили контейнера и шапки страницы */
 .month-photos-container {
-    padding-top: 10px;
     padding-bottom: 20px;
     background: #0E1621;
     min-height: 100vh;
     color: #ffffff;
   }
   
+  /* Шапка страницы месяца */
   .month-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 60px;
-    background: #0E1621;
     display: flex;
     align-items: center;
-    padding: 0 20px;
-    z-index: 100;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: #0E1621;
   }
   
-  .month-header h1 {
+  /* Кнопка "Назад" */
+  .back-button {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  
+  /* Обёртка заголовка страницы */
+  .month-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-grow: 1;
+    justify-content: center;
+  }
+  
+  .month-title-wrapper h1 {
     margin: 0;
     font-size: 24px;
     color: #ffffff;
   }
   
-  .back-button {
-    background: transparent;
-    border: 2px solid #8B5CF6;
-    color: #8B5CF6;
-    padding: 4px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-right: 20px;
-  }
-  
-  /* Панель добавления фото */
-  .add-photo-header {
-    position: fixed;
-    top: 60px;
-    left: 0;
-    right: 0;
-    height: 50px;
-    background: #0E1621;
+  /* Кнопка добавления фото (плюсик в кружке) */
+  .add-photo-btn {
+    background: #8B5CF6;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
     display: flex;
-    justify-content: flex-end;
     align-items: center;
-    padding: 0 20px;
-    z-index: 90;
-  }
-  
-  .add-photo-button {
-    background: none;
-    border: 2px solid #8B5CF6;
-    color: #8B5CF6;
-    padding: 8px 12px;
-    border-radius: 8px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+    justify-content: center;
     cursor: pointer;
-    transition: background 0.3s;
   }
   
-  .add-photo-button:hover {
-    background: rgba(139, 92, 246, 0.1);
+  .add-photo-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: #ffffff;
   }
   
   /* Стили ленты фото */
   .photos-feed {
-    margin-top: 120px;
+    margin-top: 20px; /* уменьшен отступ сверху для поднятия первого фото */
     display: flex;
     flex-direction: column;
-    gap: 0px;
+    gap: 0;
     padding: 0 3px;
   }
   
