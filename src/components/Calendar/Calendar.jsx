@@ -7,8 +7,7 @@ import {
   isSameDay,
   addMonths,
   subMonths,
-  getDay,
-  differenceInWeeks
+  getDay
 } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import './Calendar.css';
@@ -21,9 +20,8 @@ function Calendar() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
 
-  const startDate = new Date('2024-03-22');
-  const currentDate = new Date();
-  const weeksCount = differenceInWeeks(currentDate, startDate);
+  // Удалена переменная weeksCount, так как она не используется
+  // const weeksCount = differenceInWeeks(currentDate, startDate);
 
   useEffect(() => {
     localStorage.setItem('calendar-events', JSON.stringify(events));
@@ -38,6 +36,8 @@ function Calendar() {
     return [...prefixDays, ...days];
   };
 
+  // Удалена функция добавления события addEvent, так как она не используется
+  /*
   const addEvent = (event) => {
     setEvents(prev => [
       ...prev,
@@ -49,6 +49,7 @@ function Calendar() {
     ]);
     setSelectedDate(null);
   };
+  */
 
   const getEventsForDay = (day) => {
     if (!day) return [];
