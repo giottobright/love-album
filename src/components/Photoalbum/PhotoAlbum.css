@@ -1,153 +1,180 @@
 .photo-album-container {
-  padding: 16px;
   background: #0E1621;
-  font-family: 'Inter', sans-serif;
   color: #ffffff;
-}
-
-.album-header {
-  text-align: center;
-  margin-bottom: 16px;
+  min-height: 100vh;
+  padding-bottom: 60px;
 }
 
 .album-header h1 {
-  font-size: 24px;
   color: #ffffff;
-  margin-bottom: 8px;
-}
-
-.current-date {
-  font-size: 16px;
-  color: #b0b0b0;
-  opacity: 0.8;
+  text-align: center;
+  margin: 20px 0;
 }
 
 .months-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  padding: 10px;
 }
 
 .month-card {
-  background: #1a2031;
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s;
 }
 
-.month-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  border-bottom: 1px solid #2c3a4a;
-  padding-bottom: 8px;
+.month-card:hover {
+  transform: translateY(-4px);
 }
 
-.month-header h2 {
-  font-size: 18px;
-  color: #ffffff;
-  margin: 0;
-}
-
-.photo-counter {
-  font-size: 14px;
-  color: #8B5CF6;
-  font-weight: bold;
-}
-
-.photos-grid {
+.preview-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px;
+  aspect-ratio: 1;
 }
 
-.photo-container {
-  overflow: hidden;
-  border-radius: 8px;
-}
-
-.photo-wrapper {
+.preview-photo {
   position: relative;
-  width: 100%;
-  padding-bottom: 100%;
   overflow: hidden;
-  border-radius: 8px;
-  background: #000;
 }
 
-.photo-wrapper img {
-  position: absolute;
+.preview-photo img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
 }
 
-.photo-wrapper:hover img {
-  transform: scale(1.05);
-}
-
-.photo-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(14, 22, 33, 0.8);
+.month-info {
+  background: #0E1621;
   padding: 8px;
-  display: none;
+  text-align: center;
 }
 
-.photo-wrapper:hover .photo-overlay {
-  display: block;
-}
-
-.photo-title-input,
-.photo-description-input {
-  width: 100%;
-  background: transparent;
-  border: none;
+.month-info h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: bold;
   color: #ffffff;
-  font-size: 14px;
-  margin-bottom: 4px;
 }
 
-.add-photo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px dashed #8B5CF6;
+.month-info span {
+  color: #ffffff;
+  font-size: 12px;
+}
+
+/* Новые стили для панели добавления фото и модального окна */
+.add-photo-header {
+  padding: 10px 20px;
+  text-align: right;
+}
+
+.add-photo-button {
+  background: none;
+  border: 2px solid #8B5CF6;
+  color: #8B5CF6;
+  padding: 8px 12px;
   border-radius: 8px;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   cursor: pointer;
-  padding: 16px;
   transition: background 0.3s;
 }
 
-.add-photo:hover {
-  background: rgba(139, 92, 246, 0.2);
+.add-photo-button:hover {
+  background: rgba(139, 92, 246, 0.1);
 }
 
-.add-photo-label {
-  text-align: center;
-  cursor: pointer;
+/* ... остальные стили остаются без изменений ... */
+
+/* Стили для модального окна с формой загрузки фото */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(14, 22, 33, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
 }
 
-.photo-input {
-  display: none;
+.modal-content {
+  background: #0E1621;
+  padding: 30px;
+  border-radius: 16px;
+  width: 320px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+  transform: scale(0.95);
+  animation: modalAppear 0.3s forwards;
 }
 
-.add-photo-text {
-  color: #8B5CF6;
-  font-weight: 500;
-}
-
-.add-icon {
-  font-size: 24px;
-  margin-bottom: 4px;
-}
-
-@media (min-width: 480px) {
-  .photos-grid {
-    grid-template-columns: repeat(4, 1fr);
+@keyframes modalAppear {
+  to {
+    transform: scale(1);
   }
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.modal-content label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  border-radius: 8px;
+  border: 1px solid #444444;
+  background: #141a26;
+  color: #ffffff;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.modal-content input:focus,
+.modal-content textarea:focus,
+.modal-content select:focus {
+  border-color: #8B5CF6;
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  background: #8B5CF6;
+  color: #0E1621;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  font-weight: bold;
+}
+
+.modal-actions button:hover {
+  background: #7351d8;
+  transform: translateY(-2px);
 }

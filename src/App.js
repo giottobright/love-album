@@ -11,6 +11,7 @@ import Goals from './components/Additional/Goals/Goals';
 import Wishlist from './components/Additional/Wishlist/Wishlist';
 import Navigation from './components/Navigation/Navigation';
 import './App.css';
+import MonthPhotos from './components/MonthPhotos/MonthPhotos';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/home" element={<Home />} />
           <Route path="/photoalbum" element={<PhotoAlbum />} />
+          <Route path="/photoalbum/:monthKey" element={<MonthPhotos />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/additional/*" element={<Additional />}>
             {/* При переходе по "/additional" по умолчанию открывается Recipes */}
