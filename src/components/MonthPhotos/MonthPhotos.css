@@ -15,10 +15,16 @@
     background: #0E1621;
   }
   
-  /* Кнопка "Назад" */
+  /* Кнопка "Назад" - оформлена по стилю с плюсом, фиолетового цвета */
   .back-button {
-    background: none;
+    background: #8B5CF6;
     border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: #ffffff;
     font-size: 20px;
     cursor: pointer;
@@ -60,7 +66,7 @@
   
   /* Стили ленты фото */
   .photos-feed {
-    margin-top: 20px; /* уменьшен отступ сверху для поднятия первого фото */
+    margin-top: 20px; /* Уменьшен отступ сверху, чтобы первое фото было ближе к заголовку */
     display: flex;
     flex-direction: column;
     gap: 0;
