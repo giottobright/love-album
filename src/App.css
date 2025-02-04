@@ -38,6 +38,10 @@ body {
 .app-container {
   /* нижний отступ равен высоте нижней навигационной панели (например, 60px) */
   padding-bottom: 60px;
+  .app-container {
+    width: 100%;
+    overflow-x: hidden;
+  }
 }
 
 @keyframes App-logo-spin {

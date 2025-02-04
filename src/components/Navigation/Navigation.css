@@ -1,10 +1,12 @@
 .bottom-navigation {
-  display: flex;
   position: fixed;
   bottom: 0;
-  width: 100%;
-  background: #0E1621;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #0E1621; /* или другой фон, соответствующий вашему дизайну */
   border-top: 1px solid #333;
+  display: flex;
 }
 
 .nav-item {
