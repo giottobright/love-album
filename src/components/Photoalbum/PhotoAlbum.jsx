@@ -55,20 +55,25 @@ function PhotoAlbum() {
   return (
     <div className="photo-album-container">
       <header className="album-header">
-        <h1>Наш Фотоальбом</h1>
+        <div className="album-header-content">
+          <div className="album-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" fill="none" stroke="currentColor" strokeWidth="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <polyline points="21 15 16 10 5 21" fill="none" stroke="currentColor" strokeWidth="2"/>
+            </svg>
+          </div>
+          <h2>Наш фотоальбом</h2>
+          <button className="add-event-button" onClick={() => setShowAddModal(true)}>
+            <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </button>
+        </div>
       </header>
 
-      {/* Панель добавления фото */}
-      <div className="add-photo-header">
-        <button className="add-photo-button" onClick={() => setShowAddModal(true)}>
-          <span>Добавить фото</span>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" 
-               xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 5v14M5 12h14" stroke="#8B5CF6" strokeWidth="2" 
-                  strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
-      </div>
+
 
       {showAddModal && (
         <div className="modal-overlay" onClick={() => setShowAddModal(false)}>

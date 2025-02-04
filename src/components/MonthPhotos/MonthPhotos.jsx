@@ -1,4 +1,3 @@
-// love-album/src/components/MonthPhotos/MonthPhotos.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { format, parse } from 'date-fns';
@@ -10,11 +9,12 @@ function MonthPhotos() {
   const navigate = useNavigate();
   const [photos, setPhotos] = useState([]);
 
-  // Состояния для редактирования данных фото (описание, дата, локация)
+  // Состояния для редактирования фото (описание, дата, локация) и изменения картинки
   const [editingIndex, setEditingIndex] = useState(null);
   const [editingComment, setEditingComment] = useState('');
   const [editingDate, setEditingDate] = useState('');
   const [editingLocation, setEditingLocation] = useState('');
+  const [editingFile, setEditingFile] = useState(null);
 
   useEffect(() => {
     const saved = localStorage.getItem('photo-album');
@@ -65,14 +65,18 @@ function MonthPhotos() {
     setEditingComment(photo.comment || '');
     setEditingDate(photo.date || '');
     setEditingLocation(photo.location || '');
+    setEditingFile(null);
   };
 
-  // Сохранение новых данных для выбранного фото
+  // Сохранение отредактированных данных для выбранного фото (в том числе замена фото, если выбрано новое)
   const saveEditedCaption = (index) => {
     const newPhotos = [...photos];
     newPhotos[index].comment = editingComment;
     newPhotos[index].date = editingDate;
     newPhotos[index].location = editingLocation;
+    if (editingFile) {
+      newPhotos[index].url = URL.createObjectURL(editingFile);
+    }
     setPhotos(newPhotos);
     const saved = localStorage.getItem('photo-album');
     let data = saved ? JSON.parse(saved) : {};
@@ -82,6 +86,19 @@ function MonthPhotos() {
     setEditingComment('');
     setEditingDate('');
     setEditingLocation('');
+    setEditingFile(null);
+  };
+
+  // Удаление фото вместе с его данными
+  const deletePhoto = (index) => {
+    if (window.confirm('Вы действительно хотите удалить это фото?')) {
+      const newPhotos = photos.filter((_, i) => i !== index);
+      setPhotos(newPhotos);
+      const saved = localStorage.getItem('photo-album');
+      let data = saved ? JSON.parse(saved) : {};
+      data[monthKey] = { photos: newPhotos };
+      localStorage.setItem('photo-album', JSON.stringify(data));
+    }
   };
 
   return (
@@ -97,7 +114,7 @@ function MonthPhotos() {
       <div className="add-photo-header">
         <button className="add-photo-button" onClick={() => setShowAddModal(true)}>
           <span>Добавить фото</span>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" 
                xmlns="http://www.w3.org/2000/svg">
             <path d="M12 5v14M5 12h14" stroke="#8B5CF6" strokeWidth="2"
                   strokeLinecap="round" strokeLinejoin="round" />
@@ -161,6 +178,25 @@ function MonthPhotos() {
             <img src={photo.url} alt="Фото" />
             {editingIndex === index ? (
               <div className="photo-caption editing">
+                <label>
+                  Сменить изображение:
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      if (e.target.files.length > 0) {
+                        setEditingFile(e.target.files[0]);
+                      }
+                    }}
+                  />
+                </label>
+                {editingFile && (
+                  <img
+                    src={URL.createObjectURL(editingFile)}
+                    alt="Новое фото"
+                    className="editing-photo-preview"
+                  />
+                )}
                 <input
                   type="text"
                   value={editingComment}
@@ -189,14 +225,21 @@ function MonthPhotos() {
                     {photo.date && <div className="photo-date">Дата: {photo.date}</div>}
                     {photo.location && <div className="photo-location">Локация: {photo.location}</div>}
                   </div>
-                ) : null}
-                {photo.comment || photo.date || photo.location ? (
-                  <span className="edit-icon" onClick={() => startEditing(index, photo)}>✏️</span>
                 ) : (
                   <button className="add-description-button" onClick={() => startEditing(index, photo)}>
                     Добавить описание
                   </button>
                 )}
+                <div className="photo-actions">
+                  {photo.comment || photo.date || photo.location ? (
+                    <span className="edit-icon" onClick={() => startEditing(index, photo)}>
+                      ✏️
+                    </span>
+                  ) : null}
+                  <span className="delete-icon" onClick={() => deletePhoto(index)}>
+                    🗑️
+                  </span>
+                </div>
               </div>
             )}
           </div>

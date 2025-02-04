@@ -1,8 +1,6 @@
-/* love-album/src/components/MonthPhotos/MonthPhotos.css */
-
 /* Общие стили контейнера и шапки */
 .month-photos-container {
-    padding-top: 70px;
+    padding-top: 10px;
     padding-bottom: 20px;
     background: #0E1621;
     min-height: 100vh;
@@ -85,7 +83,7 @@
   
   .photo-item img {
     width: 100%;
-    aspect-ratio: 1/1;
+    aspect-ratio: 1 / 1;
     object-fit: cover;
     border-radius: 8px;
   }
@@ -123,7 +121,7 @@
     font-size: 16px;
   }
   
-  /* Кнопки внутри подписи */
+  /* Стили кнопок внутри подписи */
   .photo-caption button {
     background: #8B5CF6;
     color: #ffffff;
@@ -139,11 +137,19 @@
     background: #7351d8;
   }
   
-  /* Иконка карандаша */
+  /* Иконка карандаша для редактирования */
   .edit-icon {
     color: var(--secondary-color);
     cursor: pointer;
     font-size: 20px;
+  }
+  
+  /* Иконка удаления фото */
+  .delete-icon {
+    color: #ff5555;
+    cursor: pointer;
+    font-size: 20px;
+    margin-left: 8px;
   }
   
   /* Кнопка "Добавить описание" */
@@ -162,7 +168,7 @@
     background: rgba(139, 92, 246, 0.1);
   }
   
-  /* Отображение деталей фото */
+  /* Стили для отображения деталей фото */
   .photo-details {
     display: flex;
     flex-direction: column;
@@ -175,7 +181,14 @@
     color: #b0b0b0;
   }
   
-  /* Стили модального окна */
+  /* Стили для контейнера с кнопками действий (редактировать, удалить) */
+  .photo-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  /* Стили для модального окна */
   .modal-overlay {
     position: fixed;
     top: 0;

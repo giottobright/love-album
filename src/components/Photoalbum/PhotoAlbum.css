@@ -2,59 +2,58 @@
   background: #0E1621;
   color: #ffffff;
   min-height: 100vh;
-  padding-top: 110px; /* Отступ сверху: 60px шапка + 50px панель */
   padding-bottom: 60px;
 }
 
+/* Новый Header фотоальбома */
 .album-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 60px; /* Высота шапки */
-  background: #0E1621;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 16px 20px;
+  margin: 16px 10px;
+  border-radius: 12px;
+}
+
+.album-header-content {
   display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.album-icon {
+  width: 40px;
+  height: 40px;
+  background: #8B5CF6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: center;
-  z-index: 100;
 }
 
-.album-header h1 {
-  margin: 0;
+.album-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: #ffffff;
+}
+
+.album-header h2 {
+  margin: 0 0 0 12px;
+  font-size: 20px;
+  font-weight: 600;
   color: #ffffff;
-  font-size: 24px;
 }
 
-.add-photo-header {
-  position: fixed;
-  top: 60px;  /* Под шапкой */
-  left: 0;
-  right: 0;
-  height: 50px; /* Высота панели добавления фото */
-  background: #0E1621;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 0 20px;
-  z-index: 90;
-}
-
-.add-photo-button {
+.add-event-button {
   background: none;
-  border: 2px solid #8B5CF6;
-  color: #8B5CF6;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 16px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+  border: none;
+  color: var(--secondary-color);
   cursor: pointer;
-  transition: background 0.3s;
+  margin-left: auto;
 }
 
-.add-photo-button:hover {
-  background: rgba(139, 92, 246, 0.1);
+.add-event-button svg {
+  width: 24px;
+  height: 24px;
+  fill: var(--secondary-color);
 }
 
 /* Остальные стили остаются без изменений */
