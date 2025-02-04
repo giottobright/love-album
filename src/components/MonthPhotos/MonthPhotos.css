@@ -4,11 +4,12 @@
     min-height: 100vh;
   }
   
+  /* Шапка страницы */
   .month-header {
     display: flex;
     align-items: center;
     gap: 20px;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
   }
   
   .month-header h1 {
@@ -17,33 +18,24 @@
     font-size: 24px;
   }
   
-  /* Вертикальная лента фото по типу Instagram */
-  .photos-feed {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+  /* Обновлённая кнопка "Назад" */
+  .back-button {
+    background: transparent;
+    border: 2px solid #8B5CF6;
+    color: #8B5CF6;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
   }
   
-  .photo-item {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    overflow: hidden;
+  .back-button:hover {
+    background: rgba(139, 92, 246, 0.1);
+    transform: translateX(-2px);
   }
   
-  .photo-item img {
-    width: 100%;
-    display: block;
-    object-fit: cover;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .photo-caption {
-    padding: 10px;
-    color: #ffffff;
-    font-size: 14px;
-  }
-  
-  /* Стили для панели добавления фото и модального окна */
+  /* Панель добавления фото */
   .add-photo-header {
     padding: 10px 20px;
     text-align: right;
@@ -67,24 +59,40 @@
     background: rgba(139, 92, 246, 0.1);
   }
   
-  /* Обновлённый стиль для кнопки "Назад" */
-.back-button {
-    background: transparent;
-    border: 2px solid #8B5CF6;
-    color: #8B5CF6;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 18px;
-    cursor: pointer;
-    transition: background 0.3s, transform 0.2s;
+  /* Лента фото, настроенная так, чтобы в области видимости отображалось ровно одно фото.
+     Вычисляем высоту контейнера как 100vh минус предположительная высота header и панели добавления (примерно 130px) */
+  .photos-feed {
+    height: 100vh;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    -webkit-overflow-scrolling: touch;
   }
   
-  .back-button:hover {
-    background: rgba(139, 92, 246, 0.1);
-    transform: translateX(-2px);
+  .photo-item {
+    height: 100vh; /* Контейнер всегда 100vh */
+    scroll-snap-align: start;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
   
-  /* Стили для модального окна (формы загрузки фото) на странице месяца */
+  .photo-item img {
+    width: 100%;
+    height: 60vh;
+    object-fit: cover;
+    display: block;
+  }
+  
+  .photo-caption {
+    padding: 10px;
+    color: #ffffff;
+    font-size: 14px;
+    background: rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Стили для модального окна (форма загрузки фото) */
   .modal-overlay {
     position: fixed;
     top: 0;
