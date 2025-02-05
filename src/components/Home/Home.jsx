@@ -85,7 +85,7 @@ function Home() {
       <div className="events-card">
         <div className="events-header">
           <CalendarTodayIcon className="calendar-icon" />
-          <h2>Ближайшие событи</h2>
+          <h2>Ближайшие события</h2>
           <button className="add-event-button" onClick={handleAddEventClick}>
             <AddIcon />
           </button>
