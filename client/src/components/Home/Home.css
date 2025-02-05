@@ -1,0 +1,103 @@
+.home-container {
+    padding: 5px;
+    background: #0E1621;
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+  }
+  
+  .couple-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .couple-icon {
+    width: 64px;
+    height: 64px;
+    background: #8B5CF6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .couple-icon svg {
+    font-size: 32px;
+    color: white;
+  }
+  
+  .couple-info h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+  }
+  
+  .couple-info p {
+    margin: 4px 0 0;
+    color: #94A3B8;
+    font-size: 16px;
+  }
+  
+  .events-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 0px;
+  }
+  
+  .events-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .calendar-icon {
+    color: #8B5CF6;
+  }
+  
+  /* Стили для кнопки плюсика. Фиолетовый цвет берётся из var(--secondary-color) */
+  .add-event-button {
+    background: none;
+    border: none;
+    color: var(--secondary-color);
+    cursor: pointer;
+    margin-left: auto; /* Этот стиль сдвигает кнопку к правому краю */
+  }
+  
+  .events-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+  }
+  
+  .events-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .event-item {
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 16px;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .no-events {
+    color: #94A3B8;
+    text-align: center;
+    margin: 0;
+  }
+  
+  .calendar-wrapper {
+    margin-top: 20px;
+  }
