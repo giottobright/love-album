@@ -7,35 +7,37 @@ function Auth({ children }) {
 
   useEffect(() => {
     const initAuth = async () => {
-      // Проверяем, есть ли сохранённый токен
+      // Если токен уже сохранён, используем его и устанавливаем состояние аутентификации
       const savedToken = localStorage.getItem('authToken');
-      if (savedToken) {
+      const savedAccountId = localStorage.getItem('accountId');
+      if (savedToken && savedAccountId) {
         api.setAuthToken(savedToken);
+        setAuth({ token: savedToken, accountId: savedAccountId });
         return;
       }
 
-      // Проверяем, запущено ли приложение в Telegram
-      if (window.Telegram && window.Telegram.WebApp) {
+      // Если приложение запущено в Telegram, пробуем авторизоваться через Telegram WebApp
+      if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe?.user?.id) {
         const tg = window.Telegram.WebApp;
-        
-        if (tg.initDataUnsafe?.user?.id) {
-          const telegramId = tg.initDataUnsafe.user.id.toString();
-          
-          try {
-            const { token, accountId } = await api.auth(telegramId);
-            setAuth({ token, accountId });
-            api.setAuthToken(token);
-          } catch (error) {
-            console.error('Ошибка авторизации:', error);
-          }
+        const telegramId = tg.initDataUnsafe.user.id.toString();
+        try {
+          const { token, accountId } = await api.auth(telegramId);
+          setAuth({ token, accountId });
+          api.setAuthToken(token);
+          localStorage.setItem('authToken', token);
+          localStorage.setItem('accountId', accountId);
+        } catch (error) {
+          console.error('Ошибка авторизации через Telegram:', error);
         }
       } else {
-        // Если приложение запущено не в Telegram, можно использовать тестовый токен
+        // Если не в Telegram и в режиме разработки — используем тестовый токен
         if (process.env.NODE_ENV !== 'production') {
           try {
             const { token, accountId } = await api.getTestToken();
             setAuth({ token, accountId });
             api.setAuthToken(token);
+            localStorage.setItem('authToken', token);
+            localStorage.setItem('accountId', accountId);
           } catch (error) {
             console.error('Ошибка получения тестового токена:', error);
           }
@@ -46,8 +48,8 @@ function Auth({ children }) {
     initAuth();
   }, [setAuth]);
 
-  // Показываем загрузку только если нет токена
-  if (!api.token) {
+  // Если аутентификация ещё не завершена, показываем "Загрузка..."
+  if (!auth) {
     return <div>Загрузка...</div>;
   }
 
