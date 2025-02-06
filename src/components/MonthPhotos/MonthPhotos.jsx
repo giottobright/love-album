@@ -38,9 +38,15 @@ function MonthPhotos() {
     async function loadPhotos() {
       setIsLoading(true);
       try {
-        // Предполагается, что api.fetchPhotos возвращает объект с массивом photos
         const response = await api.fetchPhotos(monthKey);
-        setPhotos(response.photos);
+        // Здесь добавляем маппинг данных: преобразуем s3_url в url
+        const mappedPhotos = response.photos.map(photo => ({
+          url: photo.s3_url, // переименовываем для использования в <img src={photo.url} />
+          comment: photo.comment,
+          date: photo.photo_date, // если используете другое имя, можно заменить на photo.date
+          location: photo.location
+        }));
+        setPhotos(mappedPhotos);
       } catch (error) {
         console.error('Ошибка загрузки фотографий:', error);
       } finally {

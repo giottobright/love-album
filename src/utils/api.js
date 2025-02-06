@@ -1,4 +1,4 @@
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3014';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 
 export const api = {
   async fetchWithError(endpoint, options = {}) {
