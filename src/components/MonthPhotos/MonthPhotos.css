@@ -257,3 +257,14 @@
   .modal-actions button:hover {
     background: #7351d8;
   }
+
+  .description-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.description-header p {
+  margin: 0;
+  flex-grow: 1;
+}

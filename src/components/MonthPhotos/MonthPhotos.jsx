@@ -23,28 +23,28 @@ function MonthPhotos() {
   });
 
   // Состояния для модального окна добавления фото
+  // Здесь вместо поля "date" используем поле "day" – число, введённое пользователем
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState({
     file: null,
     comment: '',
-    date: '',
+    day: '',
     location: '',
   });
 
   const monthDate = parse(monthKey, 'yyyy-MM', new Date());
 
-  // При загрузке компонента (или изменении monthKey) получаем список фотографий из API
   useEffect(() => {
     async function loadPhotos() {
       setIsLoading(true);
       try {
         const response = await api.fetchPhotos(monthKey);
-        // Здесь добавляем маппинг данных: преобразуем s3_url в url
+        // Преобразуем s3_url в url для использования в <img src={photo.url} />
         const mappedPhotos = response.photos.map(photo => ({
-          url: photo.s3_url, // переименовываем для использования в <img src={photo.url} />
+          url: photo.s3_url,
           comment: photo.comment,
-          date: photo.photo_date, // если используете другое имя, можно заменить на photo.date
-          location: photo.location
+          date: photo.photo_date,
+          location: photo.location,
         }));
         setPhotos(mappedPhotos);
       } catch (error) {
@@ -56,51 +56,63 @@ function MonthPhotos() {
     loadPhotos();
   }, [monthKey]);
 
-  // Обработчик добавления нового фото через модальное окно
-// ... остальной код ...
-
-async function handleAddPhoto() {
-  if (!modalData.file) {
-    alert('Выберите фото');
-    return;
-  }
-
-  try {
-    const formData = new FormData();
-    formData.append('photo', modalData.file); // Убедитесь, что ключ 'photo' совпадает с серверным
-    formData.append('comment', modalData.comment || '');
-    formData.append('date', modalData.date || '');
-    formData.append('location', modalData.location || '');
-    formData.append('monthKey', monthKey); // Добавляем информацию о месяце
-
-    const result = await api.uploadPhoto(formData);
-    
-    if (result.success) {
-      const newPhoto = {
-        url: result.photoUrl,
-        comment: modalData.comment,
-        date: modalData.date,
-        location: modalData.location,
-      };
-      
-      setPhotos(prev => [...prev, newPhoto]);
-      setShowModal(false);
-      setModalData({
-        file: null,
-        comment: '',
-        date: '',
-        location: '',
-      });
-    } else {
-      throw new Error(result.error || 'Ошибка при загрузке фото');
+  async function handleAddPhoto() {
+    if (!modalData.file) {
+      alert('Выберите фото');
+      return;
     }
-  } catch (error) {
-    console.error('Ошибка при загрузке фото:', error);
-    alert(`Ошибка при загрузке фото: ${error.message}`);
-  }
-}
 
-  // Редактирование выбранного фото: установка текущих значений
+    // Если поле «День» не заполнено, то:
+    // – Если выбранный альбом соответствует текущему месяцу, используем сегодняшний день.
+    // – Если выбранный месяц не актуален, оставляем дату пустой.
+    let fullDate = '';
+    const currentMonth = format(new Date(), 'yyyy-MM');
+    if (!modalData.day) {
+      if (monthKey === currentMonth) {
+        const currentDay = new Date().getDate();
+        fullDate = `${monthKey}-${currentDay.toString().padStart(2, '0')}`;
+      } else {
+        fullDate = '';
+      }
+    } else {
+      fullDate = `${monthKey}-${modalData.day.toString().padStart(2, '0')}`;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('photo', modalData.file);
+      formData.append('comment', modalData.comment || '');
+      formData.append('date', fullDate);
+      formData.append('location', modalData.location || '');
+      formData.append('monthKey', monthKey);
+
+      const result = await api.uploadPhoto(formData);
+
+      if (result.success) {
+        const newPhoto = {
+          url: result.photoUrl,
+          comment: modalData.comment,
+          date: fullDate,
+          location: modalData.location,
+        };
+
+        setPhotos(prev => [...prev, newPhoto]);
+        setShowModal(false);
+        setModalData({
+          file: null,
+          comment: '',
+          day: '',
+          location: '',
+        });
+      } else {
+        throw new Error(result.error || 'Ошибка при загрузке фото');
+      }
+    } catch (error) {
+      console.error('Ошибка при загрузке фото:', error);
+      alert(`Ошибка при загрузке фото: ${error.message}`);
+    }
+  }
+
   function startEditing(index) {
     const photo = photos[index];
     setEditingIndex(index);
@@ -112,7 +124,6 @@ async function handleAddPhoto() {
     });
   }
 
-  // Сохранение изменений (редактирование) фото
   async function handleSaveEdit(index) {
     const updatedPhoto = { ...photos[index],
       comment: editingData.comment,
@@ -120,22 +131,19 @@ async function handleAddPhoto() {
       location: editingData.location,
     };
     if (editingData.file) {
-      // Для предпросмотра создаем URL из нового файла; в реальном случае можно вызвать API для обновления
+      // Если загружается новое изображение, создаём URL для предпросмотра
       updatedPhoto.url = URL.createObjectURL(editingData.file);
     }
-    // Обновляем состояние фотографий
     const newPhotos = [...photos];
     newPhotos[index] = updatedPhoto;
     setPhotos(newPhotos);
     setEditingIndex(null);
     setEditingData({ comment: '', date: '', location: '', file: null });
-    // При необходимости вызовите API для сохранения изменений в базе
+    // Здесь можно вызвать API для сохранения изменений, если требуется
   }
 
-  // Удаление фото из списка
   async function handleDeletePhoto(index) {
     if (window.confirm('Вы действительно хотите удалить это фото?')) {
-      // Здесь можно также вызвать API для удаления записи в базе
       setPhotos(prev => prev.filter((_, i) => i !== index));
     }
   }
@@ -151,8 +159,8 @@ async function handleAddPhoto() {
         </div>
         <button className="add-photo-btn" onClick={() => setShowModal(true)}>
           <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <line x1="12" y1="5" x2="12" y2="19" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-            <line x1="5" y1="12" x2="19" y2="12" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            <line x1="12" y1="5" x2="12" y2="19" stroke="white" strokeWidth="2" strokeLinecap="round" />
+            <line x1="5" y1="12" x2="19" y2="12" stroke="white" strokeWidth="2" strokeLinecap="round" />
           </svg>
         </button>
       </header>
@@ -182,11 +190,14 @@ async function handleAddPhoto() {
               />
             </label>
             <label>
-              Дата:
+              День (опционально):
               <input
-                type="date"
-                value={modalData.date}
-                onChange={(e) => setModalData(prev => ({ ...prev, date: e.target.value }))}
+                type="number"
+                min="1"
+                max="31"
+                value={modalData.day}
+                onChange={(e) => setModalData(prev => ({ ...prev, day: e.target.value }))}
+                placeholder="Введите число"
               />
             </label>
             <label>

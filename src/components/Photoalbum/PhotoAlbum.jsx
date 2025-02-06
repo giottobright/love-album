@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { format, eachMonthOfInterval, compareDesc } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import './PhotoAlbum.css';
+import { api } from '../../utils/api';
 
 function PhotoAlbum() {
+  const { monthKey } = useParams();
   const [months, setMonths] = useState(() => {
     const saved = localStorage.getItem('photo-album');
     return saved ? JSON.parse(saved) : {};
@@ -19,38 +21,76 @@ function PhotoAlbum() {
   }).sort(compareDesc);
 
   // Состояния для модального окна добавления фото
+  // Здесь поле day – это введённое пользователем число (день месяца)
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState('');
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [selectedComment, setSelectedComment] = useState('');
-  const [selectedDate, setSelectedDate] = useState('');
-  const [selectedLocation, setSelectedLocation] = useState('');
+  const [modalData, setModalData] = useState({
+    file: null,
+    comment: '',
+    day: '',
+    location: '',
+  });
 
-  const handleModalSubmit = () => {
-    if (!selectedFolder || !selectedFile) {
-      alert('Выберите папку и фото');
+  async function handleAddPhoto() {
+    if (!selectedFolder) {
+      alert('Выберите папку (месяц и год)');
       return;
     }
-    const newPhoto = { 
-      url: URL.createObjectURL(selectedFile),
-      comment: selectedComment, // комментарий к фото
-      date: selectedDate,
-      location: selectedLocation
-    };
-    const updatedMonths = { ...months };
-    if (!updatedMonths[selectedFolder]) {
-      updatedMonths[selectedFolder] = { photos: [] };
+    if (!modalData.file) {
+      alert('Выберите фото');
+      return;
     }
-    updatedMonths[selectedFolder].photos.push(newPhoto);
-    setMonths(updatedMonths);
-    localStorage.setItem('photo-album', JSON.stringify(updatedMonths));
-    setShowAddModal(false);
-    setSelectedFile(null);
-    setSelectedFolder('');
-    setSelectedComment('');
-    setSelectedDate('');
-    setSelectedLocation('');
-  };
+    if (!modalData.day) {
+      alert('Введите число (день)');
+      return;
+    }
+  
+    try {
+      // Формируем полную дату на основе выбранного альбома (selectedFolder) и введённого дня.
+      // Если введено однозначное число, добавляем ведущий ноль.
+      const dayFormatted = modalData.day.toString().padStart(2, '0');
+      const fullDate = `${selectedFolder}-${dayFormatted}`;
+
+      const formData = new FormData();
+      formData.append('photo', modalData.file);
+      formData.append('comment', modalData.comment || '');
+      formData.append('date', fullDate);
+      formData.append('location', modalData.location || '');
+      formData.append('monthKey', selectedFolder);
+
+      const result = await api.uploadPhoto(formData);
+      
+      if (result.success) {
+        const newPhoto = {
+          url: result.photoUrl,
+          comment: modalData.comment,
+          date: fullDate,
+          location: modalData.location,
+        };
+        const updatedMonths = { ...months };
+        if (!updatedMonths[selectedFolder]) {
+          updatedMonths[selectedFolder] = { photos: [] };
+        }
+        updatedMonths[selectedFolder].photos.push(newPhoto);
+        setMonths(updatedMonths);
+        localStorage.setItem('photo-album', JSON.stringify(updatedMonths));
+        setShowAddModal(false);
+        // Сброс формы
+        setSelectedFolder('');
+        setModalData({
+          file: null,
+          comment: '',
+          day: '',
+          location: '',
+        });
+      } else {
+        throw new Error(result.error || 'Ошибка при загрузке фото');
+      }
+    } catch (error) {
+      console.error('Ошибка при загрузке фото:', error);
+      alert(`Ошибка при загрузке фото: ${error.message}`);
+    }
+  }
 
   return (
     <div className="photo-album-container">
@@ -72,8 +112,6 @@ function PhotoAlbum() {
           </button>
         </div>
       </header>
-
-
 
       {showAddModal && (
         <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
@@ -100,38 +138,41 @@ function PhotoAlbum() {
                 accept="image/*"
                 onChange={(e) => {
                   if (e.target.files.length > 0) {
-                    setSelectedFile(e.target.files[0]);
+                    setModalData(prev => ({ ...prev, file: e.target.files[0] }));
                   }
                 }}
               />
             </label>
             <label>
               Комментарий:
-              <textarea 
-                value={selectedComment} 
-                onChange={(e) => setSelectedComment(e.target.value)}
-                placeholder="Напишите комментарий к фото (необязательно)"
+              <textarea
+                value={modalData.comment}
+                onChange={(e) => setModalData(prev => ({ ...prev, comment: e.target.value }))}
+                placeholder="Комментарий к фото (необязательно)"
               />
             </label>
             <label>
-              Дата:
+              День:
               <input
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
+                type="number"
+                min="1"
+                max="31"
+                value={modalData.day}
+                onChange={(e) => setModalData(prev => ({ ...prev, day: e.target.value }))}
+                placeholder="Введите число"
               />
             </label>
             <label>
               Локация:
               <input
                 type="text"
-                value={selectedLocation}
-                onChange={(e) => setSelectedLocation(e.target.value)}
+                value={modalData.location}
+                onChange={(e) => setModalData(prev => ({ ...prev, location: e.target.value }))}
                 placeholder="Локация фото"
               />
             </label>
             <div className="modal-actions">
-              <button onClick={handleModalSubmit}>Добавить</button>
+              <button onClick={handleAddPhoto}>Добавить</button>
               <button onClick={() => setShowAddModal(false)}>Отмена</button>
             </div>
           </div>
@@ -140,12 +181,12 @@ function PhotoAlbum() {
 
       <div className="months-grid">
         {monthsArray.map((month) => {
-          const monthKey = format(month, 'yyyy-MM');
-          const photosCount = months[monthKey]?.photos?.length || 0;
-          const previewPhotos = months[monthKey]?.photos?.slice(0, 4) || [];
-          
+          const folder = format(month, 'yyyy-MM');
+          const photosCount = months[folder]?.photos?.length || 0;
+          const previewPhotos = months[folder]?.photos?.slice(0, 4) || [];
+
           return (
-            <Link to={`/photoalbum/${monthKey}`} key={monthKey} className="month-card">
+            <Link to={`/photoalbum/${folder}`} key={folder} className="month-card">
               <div className="preview-grid">
                 {previewPhotos.map((photo, idx) => (
                   <div key={idx} className="preview-photo">

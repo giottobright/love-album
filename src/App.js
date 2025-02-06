@@ -12,9 +12,11 @@ import Wishlist from './components/Additional/Wishlist/Wishlist';
 import Navigation from './components/Navigation/Navigation';
 import './App.css';
 import MonthPhotos from './components/MonthPhotos/MonthPhotos';
+import { AuthProvider } from './contexts/AuthContext';
 
 function App() {
   return (
+    <AuthProvider>
     <Router>
       <div className="app-container">
         <Routes>
@@ -36,6 +38,7 @@ function App() {
       </div>
       <Navigation />
     </Router>
+    </AuthProvider>
   );
 }
 
