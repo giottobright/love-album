@@ -13,11 +13,13 @@ import Navigation from './components/Navigation/Navigation';
 import './App.css';
 import MonthPhotos from './components/MonthPhotos/MonthPhotos';
 import { AuthProvider } from './contexts/AuthContext';
+import Auth from './components/Auth/Auth';
 
 function App() {
   return (
     <AuthProvider>
     <Router>
+    <Auth>
       <div className="app-container">
         <Routes>
           <Route path="/" element={<Navigate to="/home" replace />} />
@@ -37,6 +39,7 @@ function App() {
         </Routes>
       </div>
       <Navigation />
+      </Auth>
     </Router>
     </AuthProvider>
   );
