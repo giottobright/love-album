@@ -51,36 +51,48 @@ function MonthPhotos() {
   }, [monthKey]);
 
   // Обработчик добавления нового фото через модальное окно
-  async function handleAddPhoto() {
-    if (!modalData.file) {
-      alert('Выберите фото');
-      return;
-    }
-    const formData = new FormData();
-    formData.append('photo', modalData.file);
-    formData.append('comment', modalData.comment);
-    formData.append('date', modalData.date);
-    formData.append('location', modalData.location);
-    try {
-      const result = await api.uploadPhoto(formData);
-      if (result.success) {
-        const newPhoto = {
-          url: result.photoUrl,
-          comment: modalData.comment,
-          date: modalData.date,
-          location: modalData.location,
-        };
-        setPhotos(prev => [...prev, newPhoto]);
-        setShowModal(false);
-        setModalData({ file: null, comment: '', date: '', location: '' });
-      } else {
-        alert('Ошибка загрузки фото');
-      }
-    } catch (error) {
-      console.error('Ошибка при загрузке фото:', error);
-      alert('Ошибка при загрузке фото');
-    }
+// ... остальной код ...
+
+async function handleAddPhoto() {
+  if (!modalData.file) {
+    alert('Выберите фото');
+    return;
   }
+
+  try {
+    const formData = new FormData();
+    formData.append('photo', modalData.file); // Убедитесь, что ключ 'photo' совпадает с серверным
+    formData.append('comment', modalData.comment || '');
+    formData.append('date', modalData.date || '');
+    formData.append('location', modalData.location || '');
+    formData.append('monthKey', monthKey); // Добавляем информацию о месяце
+
+    const result = await api.uploadPhoto(formData);
+    
+    if (result.success) {
+      const newPhoto = {
+        url: result.photoUrl,
+        comment: modalData.comment,
+        date: modalData.date,
+        location: modalData.location,
+      };
+      
+      setPhotos(prev => [...prev, newPhoto]);
+      setShowModal(false);
+      setModalData({
+        file: null,
+        comment: '',
+        date: '',
+        location: '',
+      });
+    } else {
+      throw new Error(result.error || 'Ошибка при загрузке фото');
+    }
+  } catch (error) {
+    console.error('Ошибка при загрузке фото:', error);
+    alert(`Ошибка при загрузке фото: ${error.message}`);
+  }
+}
 
   // Редактирование выбранного фото: установка текущих значений
   function startEditing(index) {

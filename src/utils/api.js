@@ -1,4 +1,3 @@
-// src/utils/api.js
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 
 export const api = {
@@ -6,7 +5,6 @@ export const api = {
     const response = await fetch(`${API_URL}${endpoint}`, {
       ...options,
       headers: {
-        // Для FormData не указываем Content-Type вручную
         ...(options.headers || {}),
       },
     });
@@ -22,4 +20,8 @@ export const api = {
       body: formData,
     });
   },
+
+  async fetchPhotos(monthKey) {
+    return this.fetchWithError(`/api/photos?month=${monthKey}`);
+  }
 };
