@@ -7,6 +7,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import AddIcon from '@mui/icons-material/Add';
 import EventModal from '../EventModal/EventModal';
 import './Home.css';
+import ServerStatus from '../ServerStatus/ServerStatus';
 
 function Home() {
   const coupleName = "Дима и Таня";
@@ -78,6 +79,7 @@ function Home() {
         </div>
         <div className="couple-info">
           <h1>{coupleName}</h1>
+          <ServerStatus />
           <p>Вместе {weeksTogether} недель</p>
         </div>
       </div>
