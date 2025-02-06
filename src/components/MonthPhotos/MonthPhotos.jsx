@@ -2,104 +2,125 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { format, parse } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { api } from '../../utils/api';
 import './MonthPhotos.css';
 
 function MonthPhotos() {
   const { monthKey } = useParams();
   const navigate = useNavigate();
+
+  // Список фотографий, загруженных для выбранного месяца
   const [photos, setPhotos] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Состояния для редактирования фото (описание, дата, локация) и изменения картинки
+  // Состояния для редактирования фото
   const [editingIndex, setEditingIndex] = useState(null);
-  const [editingComment, setEditingComment] = useState('');
-  const [editingDate, setEditingDate] = useState('');
-  const [editingLocation, setEditingLocation] = useState('');
-  const [editingFile, setEditingFile] = useState(null);
+  const [editingData, setEditingData] = useState({
+    comment: '',
+    date: '',
+    location: '',
+    file: null,
+  });
 
-  useEffect(() => {
-    const saved = localStorage.getItem('photo-album');
-    if (saved) {
-      const data = JSON.parse(saved);
-      setPhotos(data[monthKey]?.photos || []);
-    }
-  }, [monthKey]);
+  // Состояния для модального окна добавления фото
+  const [showModal, setShowModal] = useState(false);
+  const [modalData, setModalData] = useState({
+    file: null,
+    comment: '',
+    date: '',
+    location: '',
+  });
 
   const monthDate = parse(monthKey, 'yyyy-MM', new Date());
 
-  // Состояния для модального окна добавления фото
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [selectedComment, setSelectedComment] = useState('');
-  const [selectedDate, setSelectedDate] = useState('');
-  const [selectedLocation, setSelectedLocation] = useState('');
+  // При загрузке компонента (или изменении monthKey) получаем список фотографий из API
+  useEffect(() => {
+    async function loadPhotos() {
+      setIsLoading(true);
+      try {
+        // Предполагается, что api.fetchPhotos возвращает объект с массивом photos
+        const response = await api.fetchPhotos(monthKey);
+        setPhotos(response.photos);
+      } catch (error) {
+        console.error('Ошибка загрузки фотографий:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadPhotos();
+  }, [monthKey]);
 
-  const handleModalSubmit = () => {
-    if (!selectedFile) {
+  // Обработчик добавления нового фото через модальное окно
+  async function handleAddPhoto() {
+    if (!modalData.file) {
       alert('Выберите фото');
       return;
     }
-    const newPhoto = {
-      url: URL.createObjectURL(selectedFile),
-      comment: selectedComment,
-      date: selectedDate,
-      location: selectedLocation
-    };
-    const saved = localStorage.getItem('photo-album');
-    let data = saved ? JSON.parse(saved) : {};
-    if (!data[monthKey]) {
-      data[monthKey] = { photos: [] };
+    const formData = new FormData();
+    formData.append('photo', modalData.file);
+    formData.append('comment', modalData.comment);
+    formData.append('date', modalData.date);
+    formData.append('location', modalData.location);
+    try {
+      const result = await api.uploadPhoto(formData);
+      if (result.success) {
+        const newPhoto = {
+          url: result.photoUrl,
+          comment: modalData.comment,
+          date: modalData.date,
+          location: modalData.location,
+        };
+        setPhotos(prev => [...prev, newPhoto]);
+        setShowModal(false);
+        setModalData({ file: null, comment: '', date: '', location: '' });
+      } else {
+        alert('Ошибка загрузки фото');
+      }
+    } catch (error) {
+      console.error('Ошибка при загрузке фото:', error);
+      alert('Ошибка при загрузке фото');
     }
-    data[monthKey].photos.push(newPhoto);
-    localStorage.setItem('photo-album', JSON.stringify(data));
-    setPhotos([...photos, newPhoto]);
-    setShowAddModal(false);
-    setSelectedFile(null);
-    setSelectedComment('');
-    setSelectedDate('');
-    setSelectedLocation('');
-  };
+  }
 
-  // Запуск редактирования данных фото
-  const startEditing = (index, photo) => {
+  // Редактирование выбранного фото: установка текущих значений
+  function startEditing(index) {
+    const photo = photos[index];
     setEditingIndex(index);
-    setEditingComment(photo.comment || '');
-    setEditingDate(photo.date || '');
-    setEditingLocation(photo.location || '');
-    setEditingFile(null);
-  };
+    setEditingData({
+      comment: photo.comment || '',
+      date: photo.date || '',
+      location: photo.location || '',
+      file: null,
+    });
+  }
 
-  // Сохранение отредактированных данных выбранного фото (в том числе замена фото, если выбрано новое)
-  const saveEditedCaption = (index) => {
+  // Сохранение изменений (редактирование) фото
+  async function handleSaveEdit(index) {
+    const updatedPhoto = { ...photos[index],
+      comment: editingData.comment,
+      date: editingData.date,
+      location: editingData.location,
+    };
+    if (editingData.file) {
+      // Для предпросмотра создаем URL из нового файла; в реальном случае можно вызвать API для обновления
+      updatedPhoto.url = URL.createObjectURL(editingData.file);
+    }
+    // Обновляем состояние фотографий
     const newPhotos = [...photos];
-    newPhotos[index].comment = editingComment;
-    newPhotos[index].date = editingDate;
-    newPhotos[index].location = editingLocation;
-    if (editingFile) {
-      newPhotos[index].url = URL.createObjectURL(editingFile);
-    }
+    newPhotos[index] = updatedPhoto;
     setPhotos(newPhotos);
-    const saved = localStorage.getItem('photo-album');
-    let data = saved ? JSON.parse(saved) : {};
-    data[monthKey] = { photos: newPhotos };
-    localStorage.setItem('photo-album', JSON.stringify(data));
     setEditingIndex(null);
-    setEditingComment('');
-    setEditingDate('');
-    setEditingLocation('');
-    setEditingFile(null);
-  };
+    setEditingData({ comment: '', date: '', location: '', file: null });
+    // При необходимости вызовите API для сохранения изменений в базе
+  }
 
-  // Удаление фото вместе с его данными
-  const deletePhoto = (index) => {
+  // Удаление фото из списка
+  async function handleDeletePhoto(index) {
     if (window.confirm('Вы действительно хотите удалить это фото?')) {
-      const newPhotos = photos.filter((_, i) => i !== index);
-      setPhotos(newPhotos);
-      const saved = localStorage.getItem('photo-album');
-      let data = saved ? JSON.parse(saved) : {};
-      data[monthKey] = { photos: newPhotos };
-      localStorage.setItem('photo-album', JSON.stringify(data));
+      // Здесь можно также вызвать API для удаления записи в базе
+      setPhotos(prev => prev.filter((_, i) => i !== index));
     }
-  };
+  }
 
   return (
     <div className="month-photos-container">
@@ -110,7 +131,7 @@ function MonthPhotos() {
         <div className="month-title-wrapper">
           <h1>{format(monthDate, 'LLLL yyyy', { locale: ru })}</h1>
         </div>
-        <button className="add-photo-btn" onClick={() => setShowAddModal(true)}>
+        <button className="add-photo-btn" onClick={() => setShowModal(true)}>
           <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
             <line x1="12" y1="5" x2="12" y2="19" stroke="white" strokeWidth="2" strokeLinecap="round"/>
             <line x1="5" y1="12" x2="19" y2="12" stroke="white" strokeWidth="2" strokeLinecap="round"/>
@@ -118,8 +139,8 @@ function MonthPhotos() {
         </button>
       </header>
 
-      {showAddModal && (
-        <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
+      {showModal && (
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>Добавить фото</h2>
             <label>
@@ -129,7 +150,7 @@ function MonthPhotos() {
                 accept="image/*"
                 onChange={(e) => {
                   if (e.target.files.length > 0) {
-                    setSelectedFile(e.target.files[0]);
+                    setModalData(prev => ({ ...prev, file: e.target.files[0] }));
                   }
                 }}
               />
@@ -137,8 +158,8 @@ function MonthPhotos() {
             <label>
               Описание:
               <textarea
-                value={selectedComment}
-                onChange={(e) => setSelectedComment(e.target.value)}
+                value={modalData.comment}
+                onChange={(e) => setModalData(prev => ({ ...prev, comment: e.target.value }))}
                 placeholder="Комментарий к фото (необязательно)"
               />
             </label>
@@ -146,99 +167,103 @@ function MonthPhotos() {
               Дата:
               <input
                 type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
+                value={modalData.date}
+                onChange={(e) => setModalData(prev => ({ ...prev, date: e.target.value }))}
               />
             </label>
             <label>
               Локация:
               <input
                 type="text"
-                value={selectedLocation}
-                onChange={(e) => setSelectedLocation(e.target.value)}
+                value={modalData.location}
+                onChange={(e) => setModalData(prev => ({ ...prev, location: e.target.value }))}
                 placeholder="Локация фото"
               />
             </label>
             <div className="modal-actions">
-              <button onClick={handleModalSubmit}>Добавить</button>
-              <button onClick={() => setShowAddModal(false)}>Отмена</button>
+              <button onClick={handleAddPhoto}>Добавить</button>
+              <button onClick={() => setShowModal(false)}>Отмена</button>
             </div>
           </div>
         </div>
       )}
 
       <div className="photos-feed">
-        {photos.map((photo, index) => (
-          <div key={index} className="photo-item">
-            <img src={photo.url} alt="Фото" />
-            {editingIndex === index ? (
-              <div className="photo-caption editing">
-                <label>
-                  Сменить изображение:
+        {isLoading ? (
+          <div>Загрузка...</div>
+        ) : (
+          photos.map((photo, index) => (
+            <div key={index} className="photo-item">
+              <img src={photo.url} alt="Фото" />
+              {editingIndex === index ? (
+                <div className="photo-caption editing">
+                  <label>
+                    Сменить изображение:
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        if (e.target.files.length > 0) {
+                          setEditingData(prev => ({ ...prev, file: e.target.files[0] }));
+                        }
+                      }}
+                    />
+                  </label>
+                  {editingData.file && (
+                    <img
+                      src={URL.createObjectURL(editingData.file)}
+                      alt="Новое фото"
+                      className="editing-photo-preview"
+                    />
+                  )}
                   <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      if (e.target.files.length > 0) {
-                        setEditingFile(e.target.files[0]);
-                      }
-                    }}
+                    type="text"
+                    value={editingData.comment}
+                    onChange={(e) => setEditingData(prev => ({ ...prev, comment: e.target.value }))}
+                    placeholder="Введите описание"
                   />
-                </label>
-                {editingFile && (
-                  <img
-                    src={URL.createObjectURL(editingFile)}
-                    alt="Новое фото"
-                    className="editing-photo-preview"
+                  <input
+                    type="date"
+                    value={editingData.date}
+                    onChange={(e) => setEditingData(prev => ({ ...prev, date: e.target.value }))}
+                    placeholder="Дата"
                   />
-                )}
-                <input
-                  type="text"
-                  value={editingComment}
-                  onChange={(e) => setEditingComment(e.target.value)}
-                  placeholder="Введите описание"
-                />
-                <input
-                  type="date"
-                  value={editingDate}
-                  onChange={(e) => setEditingDate(e.target.value)}
-                  placeholder="Дата"
-                />
-                <input
-                  type="text"
-                  value={editingLocation}
-                  onChange={(e) => setEditingLocation(e.target.value)}
-                  placeholder="Локация"
-                />
-                <button onClick={() => saveEditedCaption(index)}>Сохранить</button>
-              </div>
-            ) : (
-              <div className="photo-caption">
-                {photo.comment || photo.date || photo.location ? (
-                  <div className="photo-details">
-                    {photo.comment && <div className="photo-comment">{photo.comment}</div>}
-                    {photo.date && <div className="photo-date">Дата: {photo.date}</div>}
-                    {photo.location && <div className="photo-location">Локация: {photo.location}</div>}
-                  </div>
-                ) : (
-                  <button className="add-description-button" onClick={() => startEditing(index, photo)}>
-                    Добавить описание
-                  </button>
-                )}
-                <div className="photo-actions">
-                  {photo.comment || photo.date || photo.location ? (
-                    <span className="edit-icon" onClick={() => startEditing(index, photo)}>
-                      ✏️
-                    </span>
-                  ) : null}
-                  <span className="delete-icon" onClick={() => deletePhoto(index)}>
-                    🗑️
-                  </span>
+                  <input
+                    type="text"
+                    value={editingData.location}
+                    onChange={(e) => setEditingData(prev => ({ ...prev, location: e.target.value }))}
+                    placeholder="Локация"
+                  />
+                  <button onClick={() => handleSaveEdit(index)}>Сохранить</button>
                 </div>
-              </div>
-            )}
-          </div>
-        ))}
+              ) : (
+                <div className="photo-caption">
+                  {(photo.comment || photo.date || photo.location) ? (
+                    <div className="photo-details">
+                      {photo.comment && <div className="photo-comment">{photo.comment}</div>}
+                      {photo.date && <div className="photo-date">Дата: {photo.date}</div>}
+                      {photo.location && <div className="photo-location">Локация: {photo.location}</div>}
+                    </div>
+                  ) : (
+                    <button className="add-description-button" onClick={() => startEditing(index)}>
+                      Добавить описание
+                    </button>
+                  )}
+                  <div className="photo-actions">
+                    {(photo.comment || photo.date || photo.location) && (
+                      <span className="edit-icon" onClick={() => startEditing(index)}>
+                        ✏️
+                      </span>
+                    )}
+                    <span className="delete-icon" onClick={() => handleDeletePhoto(index)}>
+                      🗑️
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

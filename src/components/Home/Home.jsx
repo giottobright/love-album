@@ -79,7 +79,7 @@ function Home() {
         </div>
         <div className="couple-info">
           <h1>{coupleName}</h1>
-          <ServerStatus />
+          <ServerStatus/>
           <p>Вместе {weeksTogether} недель</p>
         </div>
       </div>
