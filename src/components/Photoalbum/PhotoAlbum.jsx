@@ -1,3 +1,4 @@
+// love-album/src/components/Photoalbum/PhotoAlbum.jsx
 import React, { useState } from 'react';
 import { format, eachMonthOfInterval, compareDesc } from 'date-fns';
 import { ru } from 'date-fns/locale';
@@ -14,14 +15,12 @@ function PhotoAlbum() {
 
   const startDate = new Date('2024-03-22');
   const currentDate = new Date();
-
   const monthsArray = eachMonthOfInterval({
     start: startDate,
-    end: currentDate
+    end: currentDate,
   }).sort(compareDesc);
 
   // Состояния для модального окна добавления фото
-  // Здесь поле day – это введённое пользователем число (день месяца)
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState('');
   const [modalData, setModalData] = useState({
@@ -46,18 +45,17 @@ function PhotoAlbum() {
     }
   
     try {
-      // Формируем полную дату на основе выбранного альбома (selectedFolder) и введённого дня.
-      // Если введено однозначное число, добавляем ведущий ноль.
+      // Формируем полную дату
       const dayFormatted = modalData.day.toString().padStart(2, '0');
       const fullDate = `${selectedFolder}-${dayFormatted}`;
-
+  
       const formData = new FormData();
       formData.append('photo', modalData.file);
       formData.append('comment', modalData.comment || '');
       formData.append('date', fullDate);
       formData.append('location', modalData.location || '');
       formData.append('monthKey', selectedFolder);
-
+  
       const result = await api.uploadPhoto(formData);
       
       if (result.success) {
@@ -91,6 +89,8 @@ function PhotoAlbum() {
       alert(`Ошибка при загрузке фото: ${error.message}`);
     }
   }
+
+
 
   return (
     <div className="photo-album-container">

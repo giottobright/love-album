@@ -1,13 +1,14 @@
+// love-album/src/utils/api.js
 class Api {
     constructor() {
       this.baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:3021';
       this.token = localStorage.getItem('authToken');
     }
-  
+    
     setAuthToken(token) {
       this.token = token;
     }
-  
+    
     getHeaders(isFormData = false) {
       const headers = {};
       if (!isFormData) {
@@ -18,12 +19,12 @@ class Api {
       }
       return headers;
     }
-  
+    
     async fetchWithError(endpoint, options = {}) {
       const isFormData = options.body instanceof FormData;
       try {
         console.log('Отправка запроса:', `${this.baseUrl}${endpoint}`);
-  
+        
         const response = await fetch(`${this.baseUrl}${endpoint}`, {
           ...options,
           headers: {
@@ -31,12 +32,12 @@ class Api {
             ...(options.headers || {}),
           },
         });
-  
+    
         if (!response.ok) {
           const error = await response.json().catch(() => ({}));
           throw new Error(error.error || `HTTP error! status: ${response.status}`);
         }
-  
+    
         const data = await response.json();
         console.log('Получен ответ:', data);
         return data;
@@ -54,14 +55,14 @@ class Api {
         method: 'POST',
         body: JSON.stringify({ telegramId })
       });
-  
+      
       if (response.token) {
         this.setAuthToken(response.token);
       }
-  
+      
       return response;
     }
-  
+    
     async getTestToken() {
       if (process.env.NODE_ENV !== 'production') {
         return this.fetchWithError('/api/auth/test-token');
@@ -69,7 +70,18 @@ class Api {
       throw new Error('Метод доступен только в режиме разработки');
     }
     
-    // Добавляем метод для проверки состояния сервера
+    // Метод загрузки фото
+    async uploadPhoto(formData) {
+        return this.fetchWithError('/api/photos', {
+          method: 'POST',
+          body: formData
+        });
+      }
+    
+    async fetchPhotos(monthKey) {
+      return this.fetchWithError(`/api/photos?monthKey=${encodeURIComponent(monthKey)}`);
+    }
+    
     async checkHealth() {
       return this.fetchWithError('/api/health');
     }
