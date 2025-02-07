@@ -13,13 +13,6 @@ export function AuthProvider({ children }) {
   const [showJoinForm, setShowJoinForm] = useState(false);
   const [registrationTelegramId, setRegistrationTelegramId] = useState(null);
 
-  // Добавляем функцию joinWithCode – пока не реализовано, выводим заглушку
-  const joinWithCode = async (telegramId, inviteCode, partnerUsername) => {
-    console.log("joinWithCode вызван с", telegramId, inviteCode, partnerUsername);
-    // Пока что логика не реализована
-    return Promise.resolve();
-  };
-
   const createNewAccount = async (telegramId) => {
     try {
       const response = await api.createAccount(telegramId);
@@ -42,7 +35,6 @@ export function AuthProvider({ children }) {
       auth,
       setAuth,
       createNewAccount,
-      joinWithCode,
       showRegistrationChoice,
       setShowRegistrationChoice,
       showJoinForm,
