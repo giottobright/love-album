@@ -14,12 +14,17 @@ import './App.css';
 import MonthPhotos from './components/MonthPhotos/MonthPhotos';
 import { AuthProvider } from './contexts/AuthContext';
 import Auth from './components/Auth/Auth';
+import DebugConsole from "./components/DebugConsole";
+
 
 
 function App() {
+  console.log("🚀 Приложение монтируется!");
+
   return (
     <AuthProvider>
       <Auth>
+      <DebugConsole />  {/* ← Добавили консоль */}
     <Router>
       <div className="app-container">
         <Routes>

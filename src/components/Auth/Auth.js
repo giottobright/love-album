@@ -16,7 +16,10 @@ function Auth({ children }) {
   } = useAuth();
 
   useEffect(() => {
+
+    console.log("✅ useEffect запущен!");
     const initAuth = async () => {
+      console.log("🚀 Запускаем initAuth!");
       const savedToken = localStorage.getItem('authToken');
       const savedAccountId = localStorage.getItem('accountId');
   
@@ -27,17 +30,23 @@ function Auth({ children }) {
       }
   
       if (window.Telegram?.WebApp?.initDataUnsafe?.user?.id) {
+        console.log("🟢 window.Telegram.WebApp:", window.Telegram?.WebApp);
+console.log("🟡 window.Telegram.WebApp.initDataUnsafe:", window.Telegram?.WebApp?.initDataUnsafe);
+
         const telegramId = window.Telegram.WebApp.initDataUnsafe.user.id.toString();
         console.log("🔹 Telegram ID найден:", telegramId);
   
         try {
+          console.log("📢 Отправляем в API Telegram ID:", telegramId);
           const response = await api.auth(telegramId);
           console.log("🔹 Ответ API:", response);
   
           if (!response.exists) {
             console.log("🔸 Пользователь не найден, показываем окно регистрации");
             setRegistrationTelegramId(telegramId);
+            console.log("🛑 Должно открыться окно регистрации!"); 
             setShowRegistrationChoice(true);
+            
             return;
           }
   

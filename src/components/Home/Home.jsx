@@ -12,7 +12,7 @@ import { api } from '../../utils/api';
 import { useAuth } from '../../contexts/AuthContext';
 
 function Home() {
-  const coupleName = "Дима и Таня";
+  const coupleName = "Диа и Таня";
   const startDate = new Date("2024-03-22");
   const now = new Date();
   const weeksTogether = differenceInWeeks(now, startDate);
