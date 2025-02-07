@@ -25,7 +25,7 @@ function Auth({ children }) {
         setAuth({ token: savedToken, accountId: savedAccountId });
         return;
       }
-
+      
       if (window.Telegram?.WebApp?.initDataUnsafe?.user?.id) {
         const telegramId = window.Telegram.WebApp.initDataUnsafe.user.id.toString();
         try {
@@ -54,9 +54,9 @@ function Auth({ children }) {
         setAuth({ token: testToken, accountId: testAccountId });
       }
     };
-
+  
     initAuth();
-  }, [setAuth]);
+  }, [setAuth, setRegistrationTelegramId, setShowRegistrationChoice]);
 
   if (showRegistrationChoice) {
     return <RegistrationChoice telegramId={registrationTelegramId} />;

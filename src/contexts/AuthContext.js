@@ -1,5 +1,4 @@
-// contexts/AuthContext.js
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext } from 'react';
 import { api } from '../utils/api';
 
 const AuthContext = createContext(null);
@@ -17,7 +16,6 @@ export function AuthProvider({ children }) {
   const createNewAccount = async (telegramId) => {
     try {
       const response = await api.createAccount(telegramId);
-      
       if (response.token) {
         setAuth({ token: response.token, accountId: response.user.account_id });
         api.setAuthToken(response.token);

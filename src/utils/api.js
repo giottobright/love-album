@@ -18,16 +18,6 @@ class Api {
       return headers;
       }
     
-    getHeaders(isFormData = false) {
-      const headers = {};
-      if (!isFormData) {
-        headers['Content-Type'] = 'application/json';
-      }
-      if (this.token) {
-        headers['Authorization'] = `Bearer ${this.token}`;
-      }
-      return headers;
-    }
     
     async fetchWithError(endpoint, options = {}) {
       const isFormData = options.body instanceof FormData;
