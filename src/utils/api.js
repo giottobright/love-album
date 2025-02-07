@@ -1,12 +1,21 @@
 // love-album/src/utils/api.js
 class Api {
     constructor() {
-      this.baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:3021';
+      this.baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:3030';
       this.token = localStorage.getItem('authToken');
     }
     
     setAuthToken(token) {
       this.token = token;
+    }
+
+    getHeaders(isFormData) {
+      const token = localStorage.getItem('authToken'); // всегда читаем актуальный токен
+      const headers = isFormData ? {} : { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      return headers;
     }
     
     getHeaders(isFormData = false) {
@@ -85,6 +94,15 @@ class Api {
     async checkHealth() {
       return this.fetchWithError('/api/health');
     }
+
+    async testLogin() {
+      if (process.env.NODE_ENV !== 'production') {
+          return this.fetchWithError('/api/auth/test-login', {
+              method: 'POST'
+          });
+      }
+      throw new Error('Test login not available in production');
+  }
   }
   
   export const api = new Api();

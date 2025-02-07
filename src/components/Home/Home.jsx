@@ -8,6 +8,8 @@ import AddIcon from '@mui/icons-material/Add';
 import EventModal from '../EventModal/EventModal';
 import './Home.css';
 import ServerStatus from '../ServerStatus/ServerStatus';
+import { api } from '../../utils/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 function Home() {
   const coupleName = "Дима и Таня";
@@ -21,6 +23,7 @@ function Home() {
   const [isAddMode, setIsAddMode] = useState(false);
   // Дополнительное состояние для обновления Calendar после изменения событий
   const [calendarRefresh, setCalendarRefresh] = useState(Date.now());
+  const { setAuth } = useAuth();
 
   useEffect(() => {
     const saved = localStorage.getItem('calendar-events');
@@ -33,6 +36,22 @@ function Home() {
       setUpcomingEvents(upcoming);
     }
   }, [calendarRefresh]);
+
+  const handleTestLogin = async () => {
+    try {
+        const response = await api.testLogin();
+        localStorage.setItem('authToken', response.token);
+        localStorage.setItem('accountId', response.accountId);
+        
+        // Обновить состояние авторизации
+        setAuth({ 
+            token: response.token, 
+            accountId: response.accountId 
+        });
+    } catch (error) {
+        console.error('Test login failed:', error);
+    }
+};
 
   const handleAddEventClick = () => {
     setSelectedDate(new Date());
@@ -83,6 +102,15 @@ function Home() {
           <p>Вместе {weeksTogether} недель</p>
         </div>
       </div>
+
+      {process.env.NODE_ENV !== 'production' && (
+                <button 
+                    className="test-login-button"
+                    onClick={handleTestLogin}
+                >
+                    Test Login
+                </button>
+            )}
 
       <div className="events-card">
         <div className="events-header">
