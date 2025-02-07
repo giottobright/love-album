@@ -16,7 +16,7 @@ class Api {
         headers['Authorization'] = `Bearer ${token}`;
       }
       return headers;
-    }
+      }
     
     getHeaders(isFormData = false) {
       const headers = {};

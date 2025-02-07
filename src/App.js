@@ -15,8 +15,11 @@ import MonthPhotos from './components/MonthPhotos/MonthPhotos';
 import { AuthProvider } from './contexts/AuthContext';
 import Auth from './components/Auth/Auth';
 
+
 function App() {
   return (
+    <AuthProvider>
+      <Auth>
     <Router>
       <div className="app-container">
         <Routes>
@@ -38,6 +41,8 @@ function App() {
       </div>
       <Navigation />
     </Router>
+    </Auth>
+    </AuthProvider>
   );
 }
 
