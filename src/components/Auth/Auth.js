@@ -19,24 +19,24 @@ function Auth({ children }) {
     const initAuth = async () => {
       const savedToken = localStorage.getItem('authToken');
       const savedAccountId = localStorage.getItem('accountId');
-      
+
       if (savedToken && savedAccountId) {
         api.setAuthToken(savedToken);
         setAuth({ token: savedToken, accountId: savedAccountId });
         return;
       }
-      
+
       if (window.Telegram?.WebApp?.initDataUnsafe?.user?.id) {
         const telegramId = window.Telegram.WebApp.initDataUnsafe.user.id.toString();
         try {
           const userExists = await api.checkUserExists(telegramId);
-          
+
           if (!userExists) {
             setRegistrationTelegramId(telegramId);
             setShowRegistrationChoice(true);
             return;
           }
-          
+
           const { token, accountId } = await api.auth(telegramId);
           setAuth({ token, accountId });
           api.setAuthToken(token);
@@ -54,7 +54,7 @@ function Auth({ children }) {
         setAuth({ token: testToken, accountId: testAccountId });
       }
     };
-  
+
     initAuth();
   }, [setAuth, setRegistrationTelegramId, setShowRegistrationChoice]);
 
