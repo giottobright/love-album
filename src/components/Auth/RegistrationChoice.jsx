@@ -7,17 +7,18 @@ function RegistrationChoice({ telegramId }) {
   return (
     <div className="registration-modal">
       <h2>Добро пожаловать!</h2>
-      <p>Выберите тип регистрации:</p>
+      <p>Выберите, как продолжить:</p>
       <div className="registration-buttons">
         <button onClick={() => createNewAccount(telegramId)}>
           Создать новый аккаунт
         </button>
         <button onClick={() => setShowJoinForm(true)}>
-          Присоединиться к партнеру
+          Присоединиться к партнеру (пока не работает)
         </button>
       </div>
     </div>
   );
 }
+
 
 export default RegistrationChoice;

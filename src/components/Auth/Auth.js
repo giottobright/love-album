@@ -19,44 +19,43 @@ function Auth({ children }) {
     const initAuth = async () => {
       const savedToken = localStorage.getItem('authToken');
       const savedAccountId = localStorage.getItem('accountId');
-      
+  
       if (savedToken && savedAccountId) {
         api.setAuthToken(savedToken);
         setAuth({ token: savedToken, accountId: savedAccountId });
         return;
       }
-      
+  
       if (window.Telegram?.WebApp?.initDataUnsafe?.user?.id) {
         const telegramId = window.Telegram.WebApp.initDataUnsafe.user.id.toString();
+        console.log("🔹 Telegram ID найден:", telegramId);
+  
         try {
-          const userExists = await api.checkUserExists(telegramId);
-          
-          if (!userExists) {
+          const response = await api.auth(telegramId);
+          console.log("🔹 Ответ API:", response);
+  
+          if (!response.exists) {
+            console.log("🔸 Пользователь не найден, показываем окно регистрации");
             setRegistrationTelegramId(telegramId);
             setShowRegistrationChoice(true);
             return;
           }
-          
-          const { token, accountId } = await api.auth(telegramId);
-          setAuth({ token, accountId });
-          api.setAuthToken(token);
-          localStorage.setItem('authToken', token);
-          localStorage.setItem('accountId', accountId);
+  
+          console.log("✅ Пользователь найден, выполняем авторизацию");
+          setAuth({ token: response.token, accountId: response.accountId });
+          api.setAuthToken(response.token);
+          localStorage.setItem('authToken', response.token);
+          localStorage.setItem('accountId', response.accountId);
         } catch (error) {
-          console.error('Ошибка авторизации через Telegram:', error);
+          console.error("❌ Ошибка авторизации через Telegram:", error);
         }
-      } else if (process.env.NODE_ENV !== 'production') {
-        const testToken = '4e26302ea670d1f070f75d36b123115e4bcc1e05f64ccb472bc9f3a4629c4f5d02897adf8539a2bcf7b75b2e7ccd729b8893a464357f50f338811aba5a801bcc';
-        const testAccountId = '12345';
-        localStorage.setItem('authToken', testToken);
-        localStorage.setItem('accountId', testAccountId);
-        api.setAuthToken(testToken);
-        setAuth({ token: testToken, accountId: testAccountId });
       }
     };
   
     initAuth();
   }, [setAuth, setRegistrationTelegramId, setShowRegistrationChoice]);
+  
+  
 
   if (showRegistrationChoice) {
     return <RegistrationChoice telegramId={registrationTelegramId} />;

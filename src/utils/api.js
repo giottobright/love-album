@@ -1,7 +1,7 @@
 // love-album/src/utils/api.js
 class Api {
     constructor() {
-      this.baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:3030';
+      this.baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:3031';
       this.token = localStorage.getItem('authToken');
     }
     
@@ -18,6 +18,22 @@ class Api {
       return headers;
       }
     
+      async joinWithCode(telegramId, inviteCode, partnerUsername) {
+        const response = await this.fetchWithError('/api/auth/join', {
+          method: 'POST',
+          body: JSON.stringify({ 
+            telegramId, 
+            inviteCode, 
+            partnerUsername 
+          })
+        });
+      
+        if (response.token) {
+          this.setAuthToken(response.token);
+        }
+      
+        return response;
+      }
     
     async fetchWithError(endpoint, options = {}) {
       const isFormData = options.body instanceof FormData;

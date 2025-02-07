@@ -23,25 +23,45 @@ export function AuthProvider({ children }) {
         localStorage.setItem('accountId', response.user.account_id);
         setShowRegistrationChoice(false);
       }
+    } catch (error) {
+      console.error('Ошибка создания аккаунта:', error);
+    }
+  };
+  
+
+  const joinWithCode = async (telegramId, inviteCode, partnerUsername) => {
+    try {
+      const response = await api.joinWithCode(telegramId, inviteCode, partnerUsername);
+      if (response.token) {
+        setAuth({ token: response.token, accountId: response.user.account_id });
+        api.setAuthToken(response.token);
+        localStorage.setItem('authToken', response.token);
+        localStorage.setItem('accountId', response.user.account_id);
+        setShowJoinForm(false);
+        setShowRegistrationChoice(false);
+      }
       return response;
     } catch (error) {
-      console.error('Error creating account:', error);
+      console.error('Error joining with code:', error);
       throw error;
     }
   };
 
   return (
-    <AuthContext.Provider value={{
-      auth,
-      setAuth,
-      createNewAccount,
-      showRegistrationChoice,
-      setShowRegistrationChoice,
-      showJoinForm,
-      setShowJoinForm,
-      registrationTelegramId,
-      setRegistrationTelegramId
-    }}>
+    <AuthContext.Provider 
+      value={{
+        auth,
+        setAuth,
+        createNewAccount,
+        joinWithCode,
+        showRegistrationChoice,
+        setShowRegistrationChoice,
+        showJoinForm,
+        setShowJoinForm,
+        registrationTelegramId,
+        setRegistrationTelegramId
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
