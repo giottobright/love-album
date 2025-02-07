@@ -95,6 +95,22 @@ class Api {
       return this.fetchWithError('/api/health');
     }
 
+    async checkUserExists(telegramId) {
+      const response = await this.fetchWithError('/api/auth/check-user', {
+        method: 'POST',
+        body: JSON.stringify({ telegramId })
+      });
+      return response.exists;
+    }
+    
+    async createAccount(telegramId) {
+      const response = await this.fetchWithError('/api/auth/create-account', {
+        method: 'POST',
+        body: JSON.stringify({ telegramId })
+      });
+      return response;
+    }
+
     async testLogin() {
       if (process.env.NODE_ENV !== 'production') {
           return this.fetchWithError('/api/auth/test-login', {
